@@ -1,0 +1,27 @@
+Allows users to create accounts (which may be used for other events)
+Allows sd users to pick an option to avail bus or not
+Sends a confirmation email to verify the account
+Uses a payment API to allow payment directly in the site
+Sends email automatically upon payment for confirmation
+Counts the user registered only after payment is completed
+Shows a count of the total avaialbe positions to the user 
+Shows a count of the positions avaialbe for each segment
+Allows users to pick the segemnts they want to participate in
+Allows users to create one or more groups to participate in group events
+Allows users to submit files if required for events
+Modern UI with animations
+Links to the instagram and facebook page
+
+Account registration will include the following details:
+Full name (Split into first name + last name for easier normalisation)
+email (unique)
+password
+School (drop down list)
+Class (drop down list)
+Date of birth (may not be required)
+If SD, whether they will avail bus or not
+
+For the organisers, the sie auto generates reports (in the form of excel spreadsheets) of:
+A detailed paritipant list, which shows all the participant details along with the segemnts they are part of 
+A seperate report for each segment with its participants (Group segments include the group name and participants)
+A bus list for sd students (to be manually sorted)
