@@ -1,0 +1,17 @@
+PARTICIPANT(FirstName, LastName, Email, School, CATEGORY, Date Of Birth, Bus Avail, Paid)
+CATEGORY(Class, Category)
+GROUP(Name)
+GROUP_STUDENT(PARTICIPANT_M2M, GROUP_M2M, Role)
+SOLO_SEGMENT(Name, Description)
+TEAM_SEGMENT(Name, Description, Fixed)
+SOLO_SEGMENT_PARTICPANT(SOLO_SEGMENT, PARTICIPANT)
+TEAM_SEGMENT_GROUP(TEAM_SEGMENT, GROUP)
+GROUP_INVITE(USER, GROUP)
+
+Validation Rules:
+Email must unique
+Group can have maximum of 4 participant
+SOLO_SEGMENT_PARTICPANT value combinations must be unique
+TEAM_SEGMENT_GROUP value combinations must be unique
+GROUP_INVITE value must be unique
+Date of Birth must be before 2013 inclusive
