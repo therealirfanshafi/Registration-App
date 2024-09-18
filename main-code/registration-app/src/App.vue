@@ -1,19 +1,14 @@
 <script setup lang="ts">
 import { RouterLink, RouterView } from 'vue-router'
+import CustomFooter from './components/CustomFooter.vue';
 </script>
 
 <template>
-  <header>
-
-    <div class="wrapper">
-
-      <nav>
-        <RouterLink to="/">Home</RouterLink>
-        <RouterLink to="/register">Register</RouterLink>
-      </nav>
-    </div>
-  </header>
-
+  
   <RouterView />
+  <footer>
+    <CustomFooter></CustomFooter>
+  </footer>
 </template>
+
 
