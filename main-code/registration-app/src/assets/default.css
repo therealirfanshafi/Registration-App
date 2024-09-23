@@ -1,9 +1,19 @@
-* {
+@import url('https://fonts.googleapis.com/css2?family=Aldrich&display=swap');
+
+ * {
     margin: 0;
     padding: 0;
-    font-family: "Aldrich", sans-serif;
     font-weight: 400;
+    box-sizing: border-box;
+}
+
+html {
+    font-family: "Aldrich", sans-serif;
     font-style: normal;
     font-size: 16px;
-    box-sizing: border-box;
+}
+
+.multi-bg {
+    background: linear-gradient(to right, rgb(194, 53, 53, 0.47) 0%, rgb(194, 53, 53, 0.47) 50%, rgb(52, 9, 160, 0.47) 50%, rgb(52, 9, 160, 0.47) 100%);
+    font-family: "Aldrich", sans-serif;
 }
