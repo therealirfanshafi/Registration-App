@@ -17,3 +17,16 @@ html {
     background: linear-gradient(to right, rgb(194, 53, 53, 0.47) 0%, rgb(194, 53, 53, 0.47) 50%, rgb(52, 9, 160, 0.47) 50%, rgb(52, 9, 160, 0.47) 100%);
     font-family: "Aldrich", sans-serif;
 }
+
+@media screen and (max-width: 620px) {
+    .multi-bg {
+        background: none;
+        animation: colour-chage 10s ease-in-out infinite
+    }
+
+    @keyframes colour-chage {
+        0% {background-color: rgb(52, 9, 160, 0.47);} 
+        50% {background-color: rgb(194, 53, 53, 0.47);}
+        100% {background-color: rgb(52, 9, 160, 0.47);}
+    }
+}

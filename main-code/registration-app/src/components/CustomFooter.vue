@@ -33,9 +33,10 @@
         background-color: #1B1A1A;
         color: white;
         font-family: "Inter", sans-serif;
-       font-optical-sizing: auto;
+        font-optical-sizing: auto;
         font-weight: 400;
         font-style: normal;
+        padding-top: 60px;
     }
 
     h1 {
@@ -46,7 +47,6 @@
         display: flex;
         flex-direction: column;
         align-items: center;
-        margin-top: 60px;
     }
 
     .icon-container {

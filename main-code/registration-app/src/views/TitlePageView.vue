@@ -1,20 +1,20 @@
 <template>
-    <main style="display: flex; flex-direction: column; align-items: center;">
-        <h1 style="margin-top: 150px; margin-bottom: 20px;">Sunnydale Math x Tech Fest 3</h1>
+    <main class="column-centering">
+        <h1>Sunnydale Math x Tech Fest 3</h1>
         <h2>
             The fate of the world rests on your shoulders
         </h2>
         <h2> Can you fix the timeline?</h2>
-        <p style="color: #F3292D; margin: 50px;">{{ numSeatsLeft }} seats left</p>
-        <div style="display: flex; flex-direction: column; align-items: center; margin-bottom: 20px; color: white;">
+        <p id="seat-count">{{ numSeatsLeft }} seats left</p>
+        <div class="column-centering" id="sign-up-container">
             <p>What are you waiting for</p>
-            <button style="font-size: 4rem; border: none; color: white; padding: 10px;" class="multi-bg">
+            <button class="multi-bg" id="sign-up-button">
                 Sign Up Today
             </button>
         </div>
-        <div style="display: flex; flex-direction: column; align-items: center;  margin-bottom: 50px; color: white;">
+        <div class="column-centering" id="login-container">
             <p>Already signed up?</p>
-            <button style="font-size: 2rem; border: none; color: white; padding: 10px;" class="multi-bg" >
+            <button class="multi-bg" id="login-button">
                 Login Instead
             </button>
         </div>
@@ -40,19 +40,93 @@ export default defineComponent({
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Lexend+Peta:wght@100..900&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Lexend+Mega:wght@100..900&display=swap');
-h1 {
-    font-size: 4rem;
-    color: #35984E;
-    font-family: "Lexend Peta", sans-serif;
-    font-optical-sizing: auto;
+
+
+.column-centering {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+main, button {
+    color: white;
+}
+
+button {
+    border: none;
+    padding: 10px;
+}
+
+h1, h2 {
     font-style: normal;
+    font-optical-sizing: auto;
+    text-align: center;
+}
+
+h1 {
+    font-family: "Lexend Peta", sans-serif;
+    font-size: 3rem;
+    color: #35984E;
+    margin-top: 150px;
+    margin-bottom: 20px;
 }
 
 h2 {
-    font-size: 2rem;
     font-family: "Lexend Mega", sans-serif;
-    font-optical-sizing: auto;
-    font-style: normal;
     color: #ED9797;
+    font-size: 1.5rem;
 }
+
+p {
+    font-size: 0.75rem;
+}
+
+#seat-count {
+    color: #F3292D;
+    margin: 30px;
+}
+
+#sign-up-container {
+    margin-bottom: 40px;
+}
+
+#sign-up-button {
+    font-size: 2rem;
+}
+
+#login-container {
+    margin-bottom: 50px;
+}
+
+#login-button {
+    font-size: 1rem;
+}
+
+
+@media screen and (min-width: 620px) {
+    h1 {
+        font-size: 4rem;
+    }
+
+    h2 {
+        font-size: 2rem;
+    }
+
+    p {
+        font-size: 1rem;
+    }
+
+    #seat-count {
+        margin: 50px;
+    }
+
+    #sign-up-button {
+        font-size: 4rem;
+    }
+
+    #login-button {
+        font-size: 2rem;
+    }
+}
+
 </style>
