@@ -8,15 +8,19 @@
         <p id="seat-count">{{ numSeatsLeft }} seats left</p>
         <div class="column-centering" id="sign-up-container">
             <p>What are you waiting for</p>
-            <button class="multi-bg" id="sign-up-button">
-                Sign Up Today
-            </button>
+            <RouterLink :to="{name: 'registration'}">
+                <button class="multi-bg" id="sign-up-button">
+                    Sign Up Today
+                </button>
+            </RouterLink>
         </div>
         <div class="column-centering" id="login-container">
             <p>Already signed up?</p>
-            <button class="multi-bg" id="login-button">
-                Login Instead
-            </button>
+            <RouterLink :to="{name: 'login'}">
+                <button class="multi-bg" id="login-button">
+                    Login Instead
+                </button>
+            </RouterLink>
         </div>
     </main>
     
@@ -25,7 +29,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import { useMainStore } from '@/stores/mainStore';
-
+import { RouterLink } from 'vue-router';
 
 export default defineComponent({
     data() {
