@@ -7,7 +7,7 @@
 
 <script>
 import { defineComponent } from 'vue';
-import RegistrationForm from '@/components/icons/RegistrationForm.vue';
+import RegistrationForm from '@/components/RegistrationForm.vue';
 
 export default defineComponent({
     components: {RegistrationForm}
@@ -25,5 +25,6 @@ export default defineComponent({
 
     #reg-form {
         width: 80%;
+        max-width: 750px;
     }
 </style>

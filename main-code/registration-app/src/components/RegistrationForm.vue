@@ -6,7 +6,7 @@
                 <label for="full-name">Full Name</label>
                 <input type="text" id="full-name">
             </div>
-            <div>
+            <div class="same-line">
                 <div class="logical-input-group">
                     <label for="email">Email</label>
                     <input type="email" id="email">
@@ -16,7 +16,7 @@
                     <input type="tel" id="phone-number">
                 </div>
             </div>
-            <div>
+            <div class="same-line">
                 <div class="logical-input-group">
                     <label for="password">Password</label>
                     <input type="password" id="password">
@@ -27,7 +27,7 @@
                 </div>
                 
             </div>
-            <div>
+            <div class="same-line">
                 <div class="logical-input-group">
                     <label for="school">School</label>
                     <select id="school">
@@ -55,7 +55,7 @@
             
             </div>
             <div class="logical-input-group" style="align-items: center;">
-                <p>Will you avail bus</p>
+                <p>Will you avail bus?</p>
                 <div id="bus-avail-container">
                     <div class="radio-options">
                         <label for="yes">Yes</label>
@@ -111,6 +111,41 @@ input, select {
 
 .radio-options {
     margin: 5px;
+}
+
+@media screen and (min-width: 620px) {
+    #title {
+        color: white;
+    }
+}
+
+
+@media screen and (min-width: 841px) {
+    main {
+        font-size: 1.5rem;
+    }
+
+    #title {
+        font-size: 4rem;
+    }
+
+    input, select {
+        font-size: 1rem;
+    }
+
+    .logical-input-group {
+        margin: 15px;
+    }
+
+    .same-line {
+        flex-direction: row;
+        justify-content: space-between;
+    }
+
+    .same-line div {
+        flex-basis: 45%;
+    }
+    
 }
 
 </style>
