@@ -5,7 +5,7 @@
             The fate of the world rests on your shoulders
         </h2>
         <h2> Can you fix the timeline?</h2>
-        <p id="seat-count">{{ numSeatsLeft }} seats left</p>
+        <p id="seat-count">{{ mainStore.numSeats }} seats left</p>
         <div class="column-centering" id="sign-up-container">
             <p>What are you waiting for</p>
             <RouterLink :to="{name: 'registration'}">
@@ -30,12 +30,11 @@
 import { defineComponent } from 'vue';
 import { useMainStore } from '@/stores/mainStore';
 import { RouterLink } from 'vue-router';
+import { mapStores } from 'pinia';
 
 export default defineComponent({
-    data() {
-        return {
-            numSeatsLeft: useMainStore().numSeats
-        }
+    computed: {
+        ...mapStores(useMainStore)
     }
 })
 
