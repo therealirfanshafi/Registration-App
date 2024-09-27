@@ -2,15 +2,14 @@
     <div>
         <RegistrationForm id="reg-form"/>
     </div>
-    
 </template>
 
-<script>
+<script lang="ts">
 import { defineComponent } from 'vue';
 import RegistrationForm from '@/components/RegistrationForm.vue';
 
 export default defineComponent({
-    components: {RegistrationForm}
+    components: { RegistrationForm }
 })
 
 </script>

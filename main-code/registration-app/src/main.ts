@@ -11,6 +11,7 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { faInstagram } from '@fortawesome/free-brands-svg-icons'
 import { faFacebook } from '@fortawesome/free-brands-svg-icons'
 import { faGithub } from '@fortawesome/free-brands-svg-icons/faGithub'
+import { faCheck } from '@fortawesome/free-solid-svg-icons'
 library.add(faInstagram, faFacebook, faGithub)
 
 

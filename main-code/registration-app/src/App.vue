@@ -1,11 +1,14 @@
 <script setup lang="ts">
 import {RouterView } from 'vue-router'
 import CustomFooter from './components/CustomFooter.vue';
+import { defineComponent } from 'vue';
+import { mapStores } from 'pinia';
+import { useMainStore } from './stores/mainStore';
 </script>
 
 <template>
   
-  <main id="view-container">
+  <main :class="{'logged-out': !mainStore.loggedIn, 'logged-in':mainStore.loggedIn}">
     <RouterView />
   </main>
   <footer>
@@ -13,8 +16,17 @@ import CustomFooter from './components/CustomFooter.vue';
   </footer>
 </template>
 
+<script lang="ts">
+export default defineComponent({
+  computed: {
+    ...mapStores(useMainStore)
+  }
+})
+
+</script>
+
 <style>
-#view-container {
+.logged-out {
   background-image: url("./assets/MainCoverPosterAlternative.png");
   background-attachment: fixed;
   background-size: cover;
@@ -22,8 +34,16 @@ import CustomFooter from './components/CustomFooter.vue';
   background-position-y: 90%;
 }
 
+.logged-in {
+  background-image: url("./assets/HomePageCoverJr.png");
+  background-attachment: fixed;
+  background-size: cover;
+  background-position-x: center;
+  background-position-y: 90%;
+}
+
 @media screen and (max-width: 620px) {
-  #view-container {
+  .logged-out {
     background-repeat: no-repeat;
     animation: slideshow 10s ease-in-out infinite;
   }

@@ -78,7 +78,7 @@
     </main>      
 </template>
 
-<script>
+<script lang="ts">
 import { useMainStore } from '@/stores/mainStore';
 import { mapStores } from 'pinia';
 import { defineComponent } from 'vue';
@@ -105,7 +105,7 @@ export default defineComponent({
             this.submitCount++
             if (this.validateEmail && this.validatePhoneNum && this.validatePassword && this.validateConfirmPassword && this.validateDateOfBirth && this.validatePresence) {
                 this.mainStore.login()
-                this.$router.push({name: 'title'})
+                this.$router.push({name: 'home'})
             }
         }
     },
@@ -130,7 +130,7 @@ export default defineComponent({
         },
 
         validateDateOfBirth() {
-            return new Date() - new Date(this.dateOfBirth) >= 409968000
+            return Number(new Date()) - Number(new Date(this.dateOfBirth)) >= 409968000
         },
 
         validatePresence() {

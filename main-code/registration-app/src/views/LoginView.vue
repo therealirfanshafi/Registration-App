@@ -4,7 +4,7 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
 import LoginForm from '@/components/LoginForm.vue';
 import { defineComponent } from 'vue';
 

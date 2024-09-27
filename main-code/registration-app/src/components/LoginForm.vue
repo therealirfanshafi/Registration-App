@@ -18,7 +18,7 @@
     </main>      
 </template>
 
-<script>
+<script lange="ts">
 import { useMainStore } from '@/stores/mainStore';
 import { mapStores } from 'pinia';
 import { defineComponent } from 'vue';
@@ -39,7 +39,7 @@ export default defineComponent({
             this.submitCount++
             if (this.validateEmail && this.validatePresence) {
                 this.mainStore.login()
-                this.$router.push({name: 'title'})
+                this.$router.push({name: 'home'})
             }
         }
     },
