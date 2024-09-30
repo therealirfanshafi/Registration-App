@@ -7,9 +7,20 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import RegistrationForm from '@/components/RegistrationForm.vue';
+import { useMainStore } from '@/stores/mainStore';
+import { mapStores } from 'pinia';
 
 export default defineComponent({
-    components: { RegistrationForm }
+    components: { RegistrationForm },
+    mounted() {
+        if (this.mainStore.loggedIn) {
+            this.$router.replace({name: 'home'})
+        }
+    },
+
+    computed: {
+        ...mapStores(useMainStore)
+    }
 })
 
 </script>

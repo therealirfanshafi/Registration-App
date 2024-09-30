@@ -4,7 +4,7 @@ export const useMainStore = defineStore('main', {
   state: () => {
     return {
       numSeats: 159,
-      loggedIn: true
+      loggedIn: false
     }
   },
   actions: {

@@ -33,6 +33,13 @@ import { RouterLink } from 'vue-router';
 import { mapStores } from 'pinia';
 
 export default defineComponent({
+
+    mounted() {
+        if (this.mainStore.loggedIn) {
+            this.$router.replace({name: 'home'})
+        }
+    },
+
     computed: {
         ...mapStores(useMainStore)
     }

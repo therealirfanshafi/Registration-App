@@ -6,10 +6,22 @@
 
 <script lang="ts">
 import LoginForm from '@/components/LoginForm.vue';
+import { useMainStore } from '@/stores/mainStore';
+import { mapStores } from 'pinia';
 import { defineComponent } from 'vue';
 
 export default defineComponent({
-    components: {LoginForm}
+    components: {LoginForm},
+
+    mounted() {
+        if (this.mainStore.loggedIn) {
+            this.$router.replace({name: 'home'})
+        }
+    },
+
+    computed: {
+        ...mapStores(useMainStore)
+    }
 })
 
 </script>
