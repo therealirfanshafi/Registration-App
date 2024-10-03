@@ -3,6 +3,9 @@ import TitlePageView from '@/views/TitlePageView.vue'
 import RegistrationView from '@/views/RegistrationView.vue'
 import LoginView from '@/views/LoginView.vue'
 import HomeView from '@/views/HomeView.vue'
+import PaymentView from '@/views/PaymentView.vue'
+import SegmentManagementView from '@/views/SegmentManagementView.vue'
+import ProjectSubmissionView from '@/views/ProjectSubmissionView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -27,6 +30,21 @@ const router = createRouter({
       name: 'home',
       component: HomeView
     },
+    {
+      path: '/pay',
+      name: 'payment',
+      component: PaymentView
+    },
+    {
+      path: '/manage-segments',
+      name: 'segmentManage',
+      component: SegmentManagementView
+    },
+    {
+      path: '/submit-project',
+      name: 'projectSubmission',
+      component: ProjectSubmissionView
+    }
 
   ]
 })

@@ -18,10 +18,19 @@ html {
     font-family: "Aldrich", sans-serif;
 }
 
+button.multi-bg:hover {
+    background: linear-gradient(to right, rgba(165, 34, 34, 0.47) 0%, rgb(165, 34, 34, 0.47) 50%, rgb(38, 3, 124, 0.47) 50%, rgb(38, 3, 124, 0.47) 100%);
+    cursor: pointer;
+}
+
 @media screen and (max-width: 620px) {
-    .multi-bg {
+    .multi-bg, button.multi-bg:hover {
         background: none;
         animation: colour-chage 10s ease-in-out infinite
+    }
+
+    button.multi-bg:focus {
+        background-color: rgba(95, 156, 15, 0.47);
     }
 
     @keyframes colour-chage {
@@ -29,4 +38,5 @@ html {
         50% {background-color: rgb(194, 53, 53, 0.47);}
         100% {background-color: rgb(52, 9, 160, 0.47);}
     }
+
 }

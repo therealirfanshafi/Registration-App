@@ -170,6 +170,10 @@ input, select {
     align-self: center;
 }
 
+#submit:hover, #submit:focus {
+    background-color: rgba(196, 196, 196, 0.3);
+    cursor: pointer;
+}
 
 .logical-input-group {
     margin: 10px

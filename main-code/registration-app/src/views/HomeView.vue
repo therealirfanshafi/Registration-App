@@ -47,7 +47,6 @@
 </template>
 
 <script lang="ts">
-import router from '@/router';
 import { useMainStore } from '@/stores/mainStore';
 import { mapStores } from 'pinia';
 import { defineComponent } from 'vue';
@@ -126,6 +125,11 @@ button {
     align-self: center;
     padding: 5px;
     min-width: 160px;
+}
+
+button:hover, button:focus {
+    background-color: rgba(35, 7, 89, 0.6);
+    cursor: pointer;
 }
 
 .card {
