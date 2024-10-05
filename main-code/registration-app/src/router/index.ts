@@ -6,6 +6,7 @@ import HomeView from '@/views/HomeView.vue'
 import PaymentView from '@/views/PaymentView.vue'
 import SegmentManagementView from '@/views/SegmentManagementView.vue'
 import ProjectSubmissionView from '@/views/ProjectSubmissionView.vue'
+import GroupManagementView from '@/views/GroupManagementView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -39,6 +40,11 @@ const router = createRouter({
       path: '/manage-segments',
       name: 'segmentManage',
       component: SegmentManagementView
+    },
+    {
+      path: '/manage-groups',
+      name: 'groupManage',
+      component: GroupManagementView
     },
     {
       path: '/submit-project',

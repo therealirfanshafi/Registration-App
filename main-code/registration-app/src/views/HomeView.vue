@@ -6,7 +6,7 @@
             <h2 style="text-align: center;" v-if="!paid">Complete the payment to earn your spot in the fest</h2>
             <p v-if="!paid">{{ mainStore.numSeats }} seats left</p>
             <h2 v-else>You have completed the payment. Enjoy the fest</h2>
-            <button>Complete Payment</button>
+            <button @click="$router.push({name: 'payment'})">Complete Payment</button>
         </div>
         <div class="card" id="segment-card">
             <h1>Your Segments</h1>
@@ -14,7 +14,7 @@
                 <li v-for="(item, index) of segments" :key=index>{{ item }}</li>
             </ul>
             <h2 v-else>You did not register for any segment yet</h2>
-            <button>Edit</button>
+            <button @click="$router.push({name: 'segmentManage'})">Edit</button>
         </div>
         <div class="card" id="group-card">
             <h1>Group Requests</h1>
@@ -33,14 +33,14 @@
                 <li v-for="(item, index) of yourGroups" :key=index>{{ item }}</li>
             </ul>
             <h2 v-else>You are currently not in any group</h2>
-            <button>Manage Groups</button>
+            <button @click="$router.push({name: 'groupManage'})">Manage Groups</button>
         </div>
         <div class="card" id="submission-card">
             <h1>Submissions</h1>
             <ul v-if="projects.length">
                 <li v-for="(item, index) of projects" :key=index>{{ item }}</li>
             </ul>
-            <button v-if="projects.length">Manage Submissions</button>
+            <button v-if="projects.length" @click="$router.push({name: 'projectSubmission'})">Manage Submissions</button>
             <h2 v-else>You are not registered for any segment that requires a project submission</h2>
         </div>
     </main>
@@ -93,7 +93,6 @@ main {
     display: flex;
     flex-direction: column;
     align-items: center;
-    color: white;
 }
 
 h1 {

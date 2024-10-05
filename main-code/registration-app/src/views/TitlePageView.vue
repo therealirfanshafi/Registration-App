@@ -58,10 +58,6 @@ export default defineComponent({
     align-items: center;
 }
 
-main, button {
-    color: white;
-}
-
 button {
     border: none;
     padding: 10px;

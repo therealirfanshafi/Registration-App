@@ -11,11 +11,13 @@ html {
     font-family: "Aldrich", sans-serif;
     font-style: normal;
     font-size: 16px;
+    color: white;
 }
 
 .multi-bg {
     background: linear-gradient(to right, rgb(194, 53, 53, 0.47) 0%, rgb(194, 53, 53, 0.47) 50%, rgb(52, 9, 160, 0.47) 50%, rgb(52, 9, 160, 0.47) 100%);
     font-family: "Aldrich", sans-serif;
+    color: white;
 }
 
 button.multi-bg:hover {

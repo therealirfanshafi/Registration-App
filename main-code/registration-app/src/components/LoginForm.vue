@@ -64,9 +64,6 @@ export default defineComponent({
 
 <style scoped>
 
-main {
-    color: white;
-}
 
 form, form * {
     display: flex;

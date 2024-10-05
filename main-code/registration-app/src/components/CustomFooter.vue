@@ -31,7 +31,6 @@
     
     main {
         background-color: #1B1A1A;
-        color: white;
         font-family: "Inter", sans-serif;
         font-optical-sizing: auto;
         font-weight: 400;

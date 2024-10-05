@@ -16,9 +16,21 @@
 </template>
 
 <script lang="ts">
+import { useMainStore } from '@/stores/mainStore';
+import { mapStores } from 'pinia';
 import { defineComponent } from 'vue';
 
 export default defineComponent({
+
+    mounted() {
+        if (!this.mainStore.loggedIn) {
+            this.$router.replace({name: 'login'})
+        }
+    },
+    computed: {
+        ...mapStores(useMainStore)
+    },
+
     data() {
         return {
             oldSegments:  [{name: 'Mathemine', participate: true}, {name: 'Mathsketeers', participate: false}, {name: 'Math Olympiad', participate: true}, {name: 'console.log("Code Jam")', participate: false}, {name: 'Robotics', participate: false}, {name: 'Sher Unlocked', participate: true}],
@@ -34,7 +46,7 @@ export default defineComponent({
         }
     },
     beforeRouteLeave() {
-        if (this.oldSegments != this.segments) {
+        if (JSON.stringify(this.oldSegments) !== JSON.stringify(this.segments)) {
             if (confirm("Do you want to save changes")) {
                 this.saveChanges()
             }
@@ -47,7 +59,6 @@ export default defineComponent({
 
 <style scoped>
 main {
-    color: white;
     display: flex;
     align-items: center;
     flex-direction: column;

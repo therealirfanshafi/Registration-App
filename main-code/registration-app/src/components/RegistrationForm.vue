@@ -146,10 +146,6 @@ export default defineComponent({
 
 <style scoped>
 
-main {
-    color: white;
-}
-
 form, form *, .radio-options {
     display: flex;
     flex-direction: column;
