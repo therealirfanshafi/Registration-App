@@ -1,6 +1,6 @@
 <template>
     <main>
-        <div id="button-container">
+        <div id="button-container" v-if="JSON.stringify(oldSegments) !== JSON.stringify(segments)">
             <button @click="saveChanges(); $router.push({name: 'home'});">Save Changes</button>
             <button @click="cancel(); $router.push({name: 'home'})">Cancel</button>
         </div>
@@ -39,10 +39,10 @@ export default defineComponent({
     },
     methods: {
         saveChanges() {
-            this.oldSegments = this.segments;
+            this.oldSegments = JSON.parse(JSON.stringify(this.segments));
         },
         cancel() {
-            this.segments = this.oldSegments;
+            this.segments = JSON.parse(JSON.stringify(this.oldSegments));
         }
     },
     beforeRouteLeave() {
