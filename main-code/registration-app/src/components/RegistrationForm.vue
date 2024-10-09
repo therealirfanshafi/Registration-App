@@ -11,6 +11,7 @@
                     <label for="email">Email</label>
                     <input type="email" id="email" v-model="email" autocomplete="off" :class="{error: !validateEmail && email !== ''}">
                     <p class="error-message" v-if="!validateEmail && email !== ''">Invalid email</p>
+                    <p class="error-message" v-if="!validateEmailUniqueness">Email Already in Use</p>
                 </div>
                 <div class="logical-input-group">
                     <label for="phone-number">Phone Number</label>
@@ -51,12 +52,6 @@
                         <option value="XII">XII</option>
                     </select>
                 </div>
-
-                <div class="logical-input-group">
-                    <label for="date-of-birth">Date of Birth</label>
-                    <input type="date" id="date-of-birth" v-model="dateOfBirth" :class="{error: !validateDateOfBirth && dateOfBirth !== '2025-01-01'}">
-                    <p class="error-message" v-if="!validateDateOfBirth && dateOfBirth !== '2025-01-01'">Your age must be at least 13</p>
-                </div>
             
             </div>
             <div class="logical-input-group" style="align-items: center;" v-if="school=='Sunnydale'">
@@ -74,6 +69,7 @@
             </div>
             <p class="error-message" style="align-self: center;" v-if="!validatePresence && submitCount >= 1">All fields are required</p>
             <input type="submit" value="Sign up" id="submit">
+            <p class="error-message" v-if="error">An unexpected error occured</p>
         </form>
     </main>      
 </template>
@@ -82,8 +78,16 @@
 import { useMainStore } from '@/stores/mainStore';
 import { mapStores } from 'pinia';
 import { defineComponent } from 'vue';
+import pb from '@/pocketbase';
+
 
 export default defineComponent({
+    async mounted() {
+        this.emailsUsed = (await pb.collection('Participant').getFullList({
+            fields: 'email'
+        }))
+    },
+
     data() {
         return {
             fullName: '',
@@ -93,17 +97,41 @@ export default defineComponent({
             confirmPassword: '',
             school: '',
             grade: '',
-            dateOfBirth: '2025-01-01',
             willAvailBus: 'No',
-            submitCount: 0
+            submitCount: 0,
+            emailsUsed: [],
+            error: false
         }
     },
 
 
     methods: {
-        createNewUser() {
+        async createNewUser() {
             this.submitCount++
-            if (this.validateEmail && this.validatePhoneNum && this.validatePassword && this.validateConfirmPassword && this.validateDateOfBirth && this.validatePresence) {
+            if (this.validateEmail && this.validateEmailUniqueness &&this.validatePhoneNum && this.validatePassword && this.validateConfirmPassword && this.validatePresence) {
+                const category_id = (await pb.collection('Category').getList(1, 30, {
+                    filer: `Class = ${this.grade}`
+                })).items[0].id
+                try {
+                    await pb.collection('Participant').create({
+                        email: this.email,
+                        emailVisibility: true,
+                        First_Name: this.fullName.split(' ').slice(0, -1).join(' '),
+                        Last_Name: this.fullName.split(' ').pop(),
+                        School: this.school,
+                        Category: category_id,
+                        Phone_Number: this.phoneNumber,
+                        password: this.password,
+                        passwordConfirm: this.confirmPassword,
+                        Bus_Avail: this.willAvailBus,
+                        paid: false
+
+                    })
+                    await pb.collection('Participant').authWithPassword(this.email, this.password)
+                } catch {
+                    this.error = true;
+                }
+                
                 this.mainStore.login()
                 this.$router.push({name: 'home'})
             }
@@ -121,6 +149,10 @@ export default defineComponent({
             return regExp.test(this.phoneNumber)
         },
 
+        validateEmailUniqueness() {
+            return !(this.email in this.emailsUsed)
+        },
+
         validatePassword() {
             return this.password.length >= 8
         },
@@ -129,12 +161,8 @@ export default defineComponent({
             return this.password === this.confirmPassword
         },
 
-        validateDateOfBirth() {
-            return Number(new Date()) - Number(new Date(this.dateOfBirth)) >= 409968000
-        },
-
         validatePresence() {
-            return this.fullName !== '' && this.email !== '' && this.phoneNumber !== '' && this.phoneNumber !== '+880' && this.password !== '' && this.confirmPassword !== '' && this.school !== '' && this.grade !== '' && this.dateOfBirth !== '2025-01-01';
+            return this.fullName !== '' && this.email !== '' && this.phoneNumber !== '' && this.phoneNumber !== '+880' && this.password !== '' && this.confirmPassword !== '' && this.school !== '' && this.grade !== ''
         },
 
         ...mapStores(useMainStore)
