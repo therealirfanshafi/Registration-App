@@ -123,17 +123,18 @@ export default defineComponent({
                         Phone_Number: this.phoneNumber,
                         password: this.password,
                         passwordConfirm: this.confirmPassword,
-                        Bus_Avail: this.willAvailBus,
+                        Bus_Avail: this.willAvailBus == 'Yes',
                         paid: false
 
                     })
+                    await pb.collection('Participant').requestVerification(this.email);
                     await pb.collection('Participant').authWithPassword(this.email, this.password)
+                    this.mainStore.login()
                 } catch {
                     this.error = true;
                 }
                 
-                this.mainStore.login()
-                this.$router.push({name: 'home'})
+                this.$router.push({name: 'verification'})
             }
         }
     },

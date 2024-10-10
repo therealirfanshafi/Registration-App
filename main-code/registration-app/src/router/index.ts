@@ -7,6 +7,7 @@ import PaymentView from '@/views/PaymentView.vue'
 import SegmentManagementView from '@/views/SegmentManagementView.vue'
 import ProjectSubmissionView from '@/views/ProjectSubmissionView.vue'
 import GroupManagementView from '@/views/GroupManagementView.vue'
+import VerifyEmail from '@/views/VerifyEmail.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -50,6 +51,11 @@ const router = createRouter({
       path: '/submit-project',
       name: 'projectSubmission',
       component: ProjectSubmissionView
+    },
+    {
+      path: '/verify-mail',
+      name: 'verification',
+      component: VerifyEmail
     }
 
   ]

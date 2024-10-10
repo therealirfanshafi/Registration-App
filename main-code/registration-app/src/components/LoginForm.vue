@@ -19,6 +19,7 @@
 </template>
 
 <script lange="ts">
+import pb from '@/pocketbase'
 import { useMainStore } from '@/stores/mainStore';
 import { mapStores } from 'pinia';
 import { defineComponent } from 'vue';
@@ -35,11 +36,22 @@ export default defineComponent({
 
 
     methods: {
-        authenticateUser() {
+        async authenticateUser() {
             this.submitCount++
             if (this.validateEmail && this.validatePresence) {
-                this.mainStore.login()
-                this.$router.push({name: 'home'})
+                try {
+                    await pb.collection('Participant').authWithPassword(this.email, this.password)
+                    this.mainStore.login()
+                    if (!this.mainStore.verified) {
+                        this.$router.push({name: 'verification'})
+                    } else {
+                        this.$router.push({name: 'home'})
+                    }
+                } catch {
+                    this.authFailCount += 1
+                }
+                
+                
             }
         }
     },
