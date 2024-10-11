@@ -25,6 +25,31 @@ button.multi-bg:hover {
     cursor: pointer;
 }
 
+.blue {
+    background-color: rgb(81, 42, 198, 0.4);
+}
+
+button.blue {
+    background-color: rgb(51, 18, 116, 0.6);
+}
+
+button.blue:hover, button.blue:focus {
+    background-color: rgba(35, 7, 89, 0.6);
+}
+
+.red {
+    background-color: rgba(198, 42, 42, 0.4);
+}
+
+button.red {
+    background-color: rgba(116, 18, 18, 0.6);
+}
+
+button.red:hover, button.red:focus {
+    background-color: rgba(89, 7, 7, 0.6);
+}
+
+
 @media screen and (max-width: 620px) {
     .multi-bg, button.multi-bg:hover {
         background: none;

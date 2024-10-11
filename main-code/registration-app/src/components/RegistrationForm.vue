@@ -83,9 +83,12 @@ import pb from '@/pocketbase';
 
 export default defineComponent({
     async mounted() {
-        this.emailsUsed = (await pb.collection('Participant').getFullList({
+        const emailsUsed = (await pb.collection('Participant').getFullList({
             fields: 'email'
         }))
+        emailsUsed.forEach((email) => {
+            this.emailsUsed.push(email.email)
+        })
     },
 
     data() {
@@ -110,8 +113,9 @@ export default defineComponent({
             this.submitCount++
             if (this.validateEmail && this.validateEmailUniqueness &&this.validatePhoneNum && this.validatePassword && this.validateConfirmPassword && this.validatePresence) {
                 const category_id = (await pb.collection('Category').getList(1, 30, {
-                    filer: `Class = ${this.grade}`
+                    filter: `Class = "${this.grade}"`
                 })).items[0].id
+                console.error(category_id)
                 try {
                     await pb.collection('Participant').create({
                         email: this.email,
@@ -133,7 +137,7 @@ export default defineComponent({
                 } catch {
                     this.error = true;
                 }
-                
+                location.reload()
                 this.$router.push({name: 'verification'})
             }
         }
@@ -151,7 +155,7 @@ export default defineComponent({
         },
 
         validateEmailUniqueness() {
-            return !(this.email in this.emailsUsed)
+            return !this.emailsUsed.includes(this.email)
         },
 
         validatePassword() {

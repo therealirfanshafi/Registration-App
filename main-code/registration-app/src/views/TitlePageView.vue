@@ -38,11 +38,16 @@ export default defineComponent({
         if (this.mainStore.loggedIn) {
             this.$router.replace({name: 'home'})
         }
+        if (this.mainStore.refreshFlag) {
+            this.mainStore.refreshFlag = false
+            location.reload()
+        }
     },
 
     computed: {
         ...mapStores(useMainStore)
-    }
+    },
+
 })
 
 </script>

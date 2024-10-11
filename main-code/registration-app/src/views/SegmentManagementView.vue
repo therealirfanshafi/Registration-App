@@ -4,7 +4,7 @@
             <button @click="saveChanges(); $router.push({name: 'home'});">Save Changes</button>
             <button @click="cancel(); $router.push({name: 'home'})">Cancel</button>
         </div>
-        <div id="main-container">
+        <div id="main-container" :class="{blue: category == 'Junior', red: category == 'Senior'}">
             <h1>Select the segments you want to participate in</h1>
             <div v-for="(item, index) of segments" :key="index" class="segment-checkboxes">
                 <label :for="item.name">{{ item.name }}</label>
@@ -16,15 +16,20 @@
 </template>
 
 <script lang="ts">
+import pb from '@/pocketbase';
+
 import { useMainStore } from '@/stores/mainStore';
 import { mapStores } from 'pinia';
 import { defineComponent } from 'vue';
 
 export default defineComponent({
 
-    mounted() {
+    async mounted() {
         if (!this.mainStore.loggedIn) {
             this.$router.replace({name: 'login'})
+        }
+        if (pb.authStore.model) {
+            this.category = (await pb.collection('Category').getOne(pb.authStore.model.Category)).Category
         }
     },
     computed: {
@@ -34,7 +39,8 @@ export default defineComponent({
     data() {
         return {
             oldSegments:  [{name: 'Mathemine', participate: true}, {name: 'Mathsketeers', participate: false}, {name: 'Math Olympiad', participate: true}, {name: 'console.log("Code Jam")', participate: false}, {name: 'Robotics', participate: false}, {name: 'Sher Unlocked', participate: true}],
-            segments: [{name: 'Mathemine', participate: true}, {name: 'Mathsketeers', participate: false}, {name: 'Math Olympiad', participate: true}, {name: 'console.log("Code Jam")', participate: false}, {name: 'Robotics', participate: false}, {name: 'Sher Unlocked', participate: true}]
+            segments: [{name: 'Mathemine', participate: true}, {name: 'Mathsketeers', participate: false}, {name: 'Math Olympiad', participate: true}, {name: 'console.log("Code Jam")', participate: false}, {name: 'Robotics', participate: false}, {name: 'Sher Unlocked', participate: true}],
+            category: ''
         }
     },
     methods: {
@@ -73,7 +79,6 @@ h1 {
 #main-container {
     margin-top: 200px;
     margin-bottom: 200px;
-    background-color: rgb(81, 42, 198, 0.4);
     width: 80%;
     padding: 40px;
     display: flex;

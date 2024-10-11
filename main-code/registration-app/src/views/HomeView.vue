@@ -1,22 +1,22 @@
 <template>
     <main>
-        <button id="logout" @click="mainStore.logout(); $router.push({name: 'title'})">Logout</button>
-        <div class="card" id="payment-card">
+        <button :class="{blue: category == 'Junior', red: category == 'Senior'}" id="logout" @click="mainStore.logout(); $router.push({name: 'title'})">Logout</button>
+        <div class="card" :class="{blue: category == 'Junior', red: category == 'Senior'}" id="payment-card">
             <h1>Payment</h1>
             <h2 style="text-align: center;" v-if="!paid">Complete the payment to earn your spot in the fest</h2>
             <p v-if="!paid">{{ mainStore.numSeats }} seats left</p>
             <h2 v-else>You have completed the payment. Enjoy the fest</h2>
-            <button @click="$router.push({name: 'payment'})">Complete Payment</button>
+            <button :class="{blue: category == 'Junior', red: category == 'Senior'}" @click="$router.push({name: 'payment'})">Complete Payment</button>
         </div>
-        <div class="card" id="segment-card">
+        <div class="card" :class="{blue: category == 'Junior', red: category == 'Senior'}" id="segment-card">
             <h1>Your Segments</h1>
             <ul v-if="segments.length">
                 <li v-for="(item, index) of segments" :key=index>{{ item }}</li>
             </ul>
             <h2 v-else>You did not register for any segment yet</h2>
-            <button @click="$router.push({name: 'segmentManage'})">Edit</button>
+            <button :class="{blue: category == 'Junior', red: category == 'Senior'}" @click="$router.push({name: 'segmentManage'})">Edit</button>
         </div>
-        <div class="card" id="group-card">
+        <div class="card" :class="{blue: category == 'Junior', red: category == 'Senior'}" id="group-card">
             <h1>Group Requests</h1>
             <ul id="grp-req-list" v-if="groupRequests.length">
                 <li v-for="(item, index) of groupRequests" :key=index>
@@ -33,20 +33,23 @@
                 <li v-for="(item, index) of yourGroups" :key=index>{{ item }}</li>
             </ul>
             <h2 v-else>You are currently not in any group</h2>
-            <button @click="$router.push({name: 'groupManage'})">Manage Groups</button>
+            <button :class="{blue: category == 'Junior', red: category == 'Senior'}" @click="$router.push({name: 'groupManage'})">Manage Groups</button>
         </div>
-        <div class="card" id="submission-card">
+        <div class="card" :class="{blue: category == 'Junior', red: category == 'Senior'}" id="submission-card">
             <h1>Submissions</h1>
             <ul v-if="projects.length">
                 <li v-for="(item, index) of projects" :key=index>{{ item }}</li>
             </ul>
-            <button v-if="projects.length" @click="$router.push({name: 'projectSubmission'})">Manage Submissions</button>
+            <button :class="{blue: category == 'Junior', red: category == 'Senior'}" v-if="projects.length" @click="$router.push({name: 'projectSubmission'})">Manage Submissions</button>
             <h2 v-else>You are not registered for any segment that requires a project submission</h2>
         </div>
     </main>
 </template>
 
 <script lang="ts">
+
+import pb from '@/pocketbase'
+
 import { useMainStore } from '@/stores/mainStore';
 import { mapStores } from 'pinia';
 import { defineComponent } from 'vue';
@@ -54,11 +57,14 @@ import { defineComponent } from 'vue';
 
 export default defineComponent({
 
-    mounted() {
+    async mounted() {
         if (!this.mainStore.loggedIn) {
             this.$router.replace({name: 'login'})
         } else if (!this.mainStore.verified) {
             this.$router.replace({name: 'verification'})
+        }
+        if (pb.authStore.model) {
+            this.category = (await pb.collection('Category').getOne(pb.authStore.model.Category)).Category
         }
     },
 
@@ -68,7 +74,8 @@ export default defineComponent({
             groupRequests: ["Yeah Boii", "Nerds", "Hello world"],
             yourGroups: ["Very Smart People", "I love maths", "Astronomers"],
             projects: ["Robotics", "Crisis Computerised", "Science fair"],
-            paid: false
+            paid: false,
+            category: ''
         }
     },
 
@@ -119,7 +126,6 @@ li {
 }
 
 button {
-    background-color: rgb(51, 18, 116, 0.6);
     color: white;
     border: none;
     font-size: 1.5rem;
@@ -129,12 +135,10 @@ button {
 }
 
 button:hover, button:focus {
-    background-color: rgba(35, 7, 89, 0.6);
     cursor: pointer;
 }
 
 .card {
-    background-color: rgb(81, 42, 198, 0.4);
     width: 80%;
     margin: 40px;
     padding: 10px;

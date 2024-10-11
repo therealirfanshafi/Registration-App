@@ -8,7 +8,7 @@ import { useMainStore } from './stores/mainStore';
 
 <template>
   
-  <main :class="{'logged-out': !mainStore.loggedIn, 'logged-in':mainStore.loggedIn}">
+  <main :class="{'logged-out': !mainStore.loggedIn, 'logged-in-jr': category == 'Junior', 'logged-in-sr': category == 'Senior'}" v-if="dataReady">
     <RouterView />
   </main>
   <footer>
@@ -17,7 +17,24 @@ import { useMainStore } from './stores/mainStore';
 </template>
 
 <script lang="ts">
+import pb from '@/pocketbase'
+
 export default defineComponent({
+
+  async mounted() {
+    if (pb.authStore.model) {
+      this.category = (await pb.collection('Category').getOne(pb.authStore.model.Category)).Category
+    }
+    this.dataReady = true
+  },
+
+  data() {
+    return {
+      category: '',
+      dataReady: false
+    }
+  },
+
   computed: {
     ...mapStores(useMainStore)
   }
@@ -34,8 +51,16 @@ export default defineComponent({
   background-position-y: 90%;
 }
 
-.logged-in {
+.logged-in-jr {
   background-image: url("./assets/HomePageCoverJr.png");
+  background-attachment: fixed;
+  background-size: cover;
+  background-position-x: center;
+  background-position-y: 90%;
+}
+
+.logged-in-sr {
+  background-image: url("./assets/HomePageCoverSr.png");
   background-attachment: fixed;
   background-size: cover;
   background-position-x: center;

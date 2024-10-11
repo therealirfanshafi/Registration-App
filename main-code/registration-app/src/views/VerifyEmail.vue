@@ -1,9 +1,10 @@
 <template>
     <main>
+        <button @click="mainStore.logout(); $router.push({name: 'title'})" :class="{blue: category == 'Junior', red: category == 'Senior'}" style="align-self: last baseline;">Logout</button>
         <h1>A verification email has been sent. Verify your mail and then click this button</h1>
-        <button @click="verify()">Completed Verificiation</button>
+        <button @click="verify()" :class="{blue: category == 'Junior', red: category == 'Senior'}">Completed Verificiation</button>
         <h1>Rerequest Verification</h1>
-        <button @click="resend()">Resend</button>
+        <button @click="resend()" :class="{blue: category == 'Junior', red: category == 'Senior'}">Resend</button>
     </main>
 </template>
 
@@ -14,11 +15,20 @@ import { mapStores } from "pinia";
 import { defineComponent } from "vue";
 
 export default defineComponent({
-    mounted() {
+    async mounted() {
         if (!this.mainStore.loggedIn) {
             this.$router.replace({name: 'login'})
         } else if (this.mainStore.verified) {
             this.$router.replace({name: 'home'})
+        }
+        if (pb.authStore.model) {
+            this.category = (await pb.collection('Category').getOne(pb.authStore.model.Category)).Category
+        }
+    },
+
+    data() {
+        return {
+            category: ''
         }
     },
 
@@ -59,7 +69,6 @@ main * {
 }
 
 button {
-    background-color: rgb(51, 18, 116, 0.6);
     color: white;
     border: none;
     font-size: 1.5rem;
@@ -69,7 +78,6 @@ button {
 }
 
 button:hover, button:focus {
-    background-color: rgba(35, 7, 89, 0.6);
     cursor: pointer;
 }
 

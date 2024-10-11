@@ -6,14 +6,17 @@ export const useMainStore = defineStore('main', {
     return {
       numSeats: 159,
       loggedIn: pb.authStore.isValid,
-      verified: pb.authStore.model ? pb.authStore.model.verified : false
+      verified: pb.authStore.model ? pb.authStore.model.verified : false,
+      refreshFlag: false
     }
   },
   actions: {
     login() {
       this.loggedIn = true
+      location.reload()
     },
     logout() {
+      this.refreshFlag = true
       pb.authStore.clear()
       this.loggedIn = false
     },

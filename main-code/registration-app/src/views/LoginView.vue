@@ -14,9 +14,13 @@ export default defineComponent({
     components: {LoginForm},
 
     mounted() {
-        if (this.mainStore.loggedIn) {
+
+        if (!this.mainStore.verified && this.mainStore.loggedIn) {
+            this.$router.push({name: 'verification'})
+        } else if (this.mainStore.verified) {
             this.$router.replace({name: 'home'})
         }
+        
     },
 
     computed: {

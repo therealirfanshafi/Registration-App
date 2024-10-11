@@ -42,11 +42,6 @@ export default defineComponent({
                 try {
                     await pb.collection('Participant').authWithPassword(this.email, this.password)
                     this.mainStore.login()
-                    if (!this.mainStore.verified) {
-                        this.$router.push({name: 'verification'})
-                    } else {
-                        this.$router.push({name: 'home'})
-                    }
                 } catch {
                     this.authFailCount += 1
                 }

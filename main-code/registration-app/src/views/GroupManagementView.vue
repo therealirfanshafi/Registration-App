@@ -1,21 +1,21 @@
 <template>
     <main>
         <div id="main-container">
-            <div id="new-grp-container" class="card">
+            <div id="new-grp-container" class="card" :class="{blue: category == 'Junior', red: category == 'Senior'}">
                 <h1>Create new group</h1>
                 <label for="new-grp-input">Group Name</label>
                 <input type="text" id="new-grp-input" v-model="newGroup">
-                <button @click="createNewGroup()">Create Group</button>
+                <button @click="createNewGroup()" :class="{blue: category == 'Junior', red: category == 'Senior'}">Create Group</button>
             </div>
             <div id="manage-group-container">
                 <h1 style="color:rgb(189, 129, 18);">Manage Group Members</h1>
                 <div id="manage-group-cards">
-                    <div v-for="(item, index1) of groups" :key="index1" class="card">
+                    <div v-for="(item, index1) of groups" :key="index1" class="card" :class="{blue: category == 'Junior', red: category == 'Senior'}">
                         <h2>{{ item.name }}</h2>
                         <div class="group-member-add" v-if="item.members.length < 4">
                             <label :for="`${item.name}-input`" style="font-size: 1rem;">New member email</label>
                             <input type="email" :id="`${item.name}-input`" v-model="item.memberReq">
-                            <button @click="addMember(index1)">Add member</button>
+                            <button @click="addMember(index1)" :class="{blue: category == 'Junior', red: category == 'Senior'}">Add member</button>
                         </div>
                         
                         <ul>
@@ -24,13 +24,13 @@
                                 <a @click="removeMember(index1, index2)"><font-awesome-icon icon="fa-solid fa-xmark" class="icon" style="background-color: red; border-radius: 100%"/></a>
                             </li>
                         </ul>
-                        <button @click="deleteGroup(index1)">Delete Group</button>
+                        <button :class="{blue: category == 'Junior', red: category == 'Senior'}" @click="deleteGroup(index1)">Delete Group</button>
                     </div>
                 </div>
             </div>
             <div id="manage-segments-container">
                 <h1 style="color: rgb(189, 129, 18);">Manage Group segments</h1>
-                <div class="card">
+                <div class="card" :class="{blue: category == 'Junior', red: category == 'Senior'}">
                     <div v-for="(item, index1) of segments" :key="index1" class="group-segment-relators">
                         <label :for="item.name">{{ item.name }}</label>
                         <select :id="item.name" v-model="item.group">
@@ -39,8 +39,8 @@
                         </select>
                     </div>
                     <div id="button-container" v-if="JSON.stringify(oldSegments) !== JSON.stringify(segments)">
-                        <button @click="saveChanges()">Save Changes</button>
-                        <button @click="cancel()">Cancel</button>
+                        <button :class="{blue: category == 'Junior', red: category == 'Senior'}" @click="saveChanges()">Save Changes</button>
+                        <button :class="{blue: category == 'Junior', red: category == 'Senior'}" @click="cancel()">Cancel</button>
                     </div>
                 </div>
             </div>
@@ -49,18 +49,23 @@
 </template>
 
 <script lang="ts">
+import pb from '@/pocketbase'
 import { useMainStore } from '@/stores/mainStore';
 import { mapStores } from 'pinia';
 import  { defineComponent } from 'vue';
 
 export default defineComponent({
-    mounted() {
+    async mounted() {
         if (!this.mainStore.loggedIn) {
             this.$router.replace({name: 'login'})
         } else if (!this.mainStore.verified) {
             this.$router.replace({name: 'verification'})
         }
+        if (pb.authStore.model) {
+            this.category = (await pb.collection('Category').getOne(pb.authStore.model.Category)).Category
+        }
     },
+
     computed: {
         ...mapStores(useMainStore)
     },
@@ -71,6 +76,7 @@ export default defineComponent({
             oldSegments: [{name: 'Mathsketeers', group: 'Very Smart Ppl'}, {name: 'Quick Mafs', group: 'I love maths'}, {name: 'Crisis Computerised', group: 'Very Smart People'}, {name: 'Robotics', group: null}],
             segments: [{name: 'Mathsketeers', group: 'Very Smart Ppl'}, {name: 'Quick Mafs', group: 'I love maths'}, {name: 'Crisis Computerised', group: 'Very Smart People'}, {name: 'Robotics', group: null}],
             newGroup: '',
+            category: ''
         }
     },
     methods: {
@@ -142,7 +148,6 @@ li div {
 }
 
 button {
-    background-color: rgb(51, 18, 116, 0.6);
     color: white;
     border: none;
     font-size: 1.5rem;
@@ -153,7 +158,6 @@ button {
 }
 
 button:hover, button:focus {
-    background-color: rgba(35, 7, 89, 0.6);
     cursor: pointer;
 }
 
@@ -164,7 +168,6 @@ input, select {
 }
 
 .card {
-    background-color: rgb(81, 42, 198, 0.4);
     width: 80%;
     margin-bottom: 40px;
     padding: 40px;
