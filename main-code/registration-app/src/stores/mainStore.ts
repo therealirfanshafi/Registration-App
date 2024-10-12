@@ -4,7 +4,6 @@ import  pb from '@/pocketbase/index'
 export const useMainStore = defineStore('main', {
   state: () => {
     return {
-      numSeats: 159,
       loggedIn: pb.authStore.isValid,
       verified: pb.authStore.model ? pb.authStore.model.verified : false,
       refreshFlag: false

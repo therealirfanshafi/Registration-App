@@ -1,8 +1,8 @@
 <template>
     <main>
         <div id="button-container" v-if="JSON.stringify(oldSegments) !== JSON.stringify(segments)">
-            <button @click="saveChanges(); $router.push({name: 'home'});">Save Changes</button>
-            <button @click="cancel(); $router.push({name: 'home'})">Cancel</button>
+            <button :class="{blue: category == 'Junior', red: category == 'Senior'}" @click="saveChanges(); $router.push({name: 'home'});">Save Changes</button>
+            <button :class="{blue: category == 'Junior', red: category == 'Senior'}" @click="cancel(); $router.push({name: 'home'})">Cancel</button>
         </div>
         <div id="main-container" :class="{blue: category == 'Junior', red: category == 'Senior'}">
             <h1>Select the segments you want to participate in</h1>
@@ -10,6 +10,7 @@
                 <label :for="item.name">{{ item.name }}</label>
                 <input type="checkbox" :id="item.name" v-model="item.participate">
             </div>
+            <h2>Register for group segemnts <RouterLink :to="{name: 'groupManage'}">here</RouterLink></h2>
         </div>
         
     </main>
@@ -31,6 +32,12 @@ export default defineComponent({
         if (pb.authStore.model) {
             this.category = (await pb.collection('Category').getOne(pb.authStore.model.Category)).Category
         }
+        const segmentsIntermediate = await pb.collection('Solo_Segment').getFullList()
+        if (pb.authStore.model) {    
+            this.oldSegments = segmentsIntermediate.map((val) => Object.create({name: val.Name, participate: val.Participants.includes(pb.authStore.model.id), id: val.id}))
+            this.segments = segmentsIntermediate.map((val) => Object.create({name: val.Name, participate: val.Participants.includes(pb.authStore.model.id), id: val.id}))
+        }
+
     },
     computed: {
         ...mapStores(useMainStore)
@@ -38,13 +45,24 @@ export default defineComponent({
 
     data() {
         return {
-            oldSegments:  [{name: 'Mathemine', participate: true}, {name: 'Mathsketeers', participate: false}, {name: 'Math Olympiad', participate: true}, {name: 'console.log("Code Jam")', participate: false}, {name: 'Robotics', participate: false}, {name: 'Sher Unlocked', participate: true}],
-            segments: [{name: 'Mathemine', participate: true}, {name: 'Mathsketeers', participate: false}, {name: 'Math Olympiad', participate: true}, {name: 'console.log("Code Jam")', participate: false}, {name: 'Robotics', participate: false}, {name: 'Sher Unlocked', participate: true}],
+            oldSegments: [{name: '', participate: false, id: ''}],
+            segments: [{name: '', participate: false, id: ''}],
             category: ''
         }
     },
     methods: {
-        saveChanges() {
+        async saveChanges() {
+            for (let i = 0; i <= this.oldSegments.length; i ++ ) {
+                if (this.oldSegments[i].participate != this.segments[i].participate && this.segments[i].participate) {
+                    await pb.collection('Solo_Segment').update(this.segments[i].id , {
+                        'Participants+': pb.authStore.model.id
+                    })
+                } else if (this.oldSegments[i].participate != this.segments[i].participate && !this.segments[i].participate) {
+                    await pb.collection('Solo_Segment').update(this.segments[i].id , {
+                        'Participants-': pb.authStore.model.id
+                    })
+                }
+            }
             this.oldSegments = JSON.parse(JSON.stringify(this.segments));
         },
         cancel() {
@@ -92,7 +110,6 @@ h1 {
 
 #button-container button {
     margin: 20px;
-    background-color: rgb(51, 18, 116, 0.6);
     color: white;
     border: none;
     font-size: 1rem;
@@ -102,7 +119,6 @@ h1 {
 }
 
 #button-container button:hover, #button-container button:focus {
-    background-color: rgba(35, 7, 89, 0.6);
     cursor: pointer;
 }
 
@@ -133,6 +149,10 @@ input {
     input {
         width: 20px;
         height: 20px;
+    }
+
+    a {
+        color: white;
     }
 
 }

@@ -4,7 +4,7 @@
         <div class="card" :class="{blue: category == 'Junior', red: category == 'Senior'}" id="payment-card">
             <h1>Payment</h1>
             <h2 style="text-align: center;" v-if="!paid">Complete the payment to earn your spot in the fest</h2>
-            <p v-if="!paid">{{ mainStore.numSeats }} seats left</p>
+            <p v-if="!paid">{{ numSeatsLeft }} seats left</p>
             <h2 v-else>You have completed the payment. Enjoy the fest</h2>
             <button :class="{blue: category == 'Junior', red: category == 'Senior'}" @click="$router.push({name: 'payment'})">Complete Payment</button>
         </div>
@@ -65,16 +65,62 @@ export default defineComponent({
         }
         if (pb.authStore.model) {
             this.category = (await pb.collection('Category').getOne(pb.authStore.model.Category)).Category
+            const segmentsIntermediate1 = await pb.collection('Participant').getList(1, 5, {
+                fields: "expand.Solo_Segment_via_Participants.Name",
+                filter: `Solo_Segment_via_Participants.Participants ?= "${pb.authStore.model.id}"`,
+                expand: 'Solo_Segment_via_Participants'
+            })
+            const groupsIntermediate = await pb.collection('Group').getList(1, 10, {
+                fields: 'id, Name',
+                filter: `Members ?= "${pb.authStore.model.id}"`
+            })
+            if (groupsIntermediate.items.length) {
+                this.yourGroups = groupsIntermediate.items.map((val) => val.Name)
+            }   
+            let segmentsIntermediate2: any = await pb.collection('Group').getList(1, 10, {
+                fields: 'expand.Group_Segment_via_Groups.Name',
+                filter: groupsIntermediate.items.map((val) => `Group_Segment_via_Groups ?= "${val.id}"`).join(' || '),
+                expand: 'Group_Segment_via_Groups'
+            })
+
+            if (segmentsIntermediate1.items.length) {
+                this.segments = segmentsIntermediate1.items[0].expand.Solo_Segments_via_Participant.map((val: any) => val.Name)
+            }
+
+            const segmentsIntermediate3: string[] = []
+
+            if (segmentsIntermediate2.items.length) {
+                segmentsIntermediate2 = segmentsIntermediate2.items.map((val1: any) => val1.expand.Group_Segments_via_Group.map((val2: any) => val2.Name))
+
+                segmentsIntermediate2.forEach((element: string[]) => {
+                    segmentsIntermediate3.push(...element)
+                });
+            }
+            
+            this.segments = [...this.segments, ...segmentsIntermediate3]
+            const grpReqIntermediate = await pb.collection('Group_Requests').getList(1, 10, {
+                fields: 'expand.Group.Name',
+                filter: `Participant = "${pb.authStore.model.id}"`,
+                expand: 'Group'
+            })
+            if (grpReqIntermediate.items.length) {
+                this.groupRequests = grpReqIntermediate.items.map((val) => val.expand.Group.Name)
+            }
         }
+        const numSeatsLeftIntermediate = await pb.collection('Participant').getList(1, 300, {
+                filter: 'Paid = true'
+            })
+            this.numSeatsLeft = 300 - numSeatsLeftIntermediate.items.length
     },
 
     data() {
         return {
-            segments: ["Math Olympiad", "Robotics", "Code Jam", "Sher Unlocked"],
-            groupRequests: ["Yeah Boii", "Nerds", "Hello world"],
-            yourGroups: ["Very Smart People", "I love maths", "Astronomers"],
-            projects: ["Robotics", "Crisis Computerised", "Science fair"],
+            segments: [],
+            groupRequests: [],
+            yourGroups: [],
+            projects: [],
             paid: false,
+            numSeatsLeft: 0,
             category: ''
         }
     },

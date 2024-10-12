@@ -5,7 +5,7 @@
             The fate of the world rests on your shoulders
         </h2>
         <h2> Can you fix the timeline?</h2>
-        <p id="seat-count">{{ mainStore.numSeats }} seats left</p>
+        <p id="seat-count">{{ numSeatsLeft }} seats left</p>
         <div class="column-centering" id="sign-up-container">
             <p>What are you waiting for</p>
             <RouterLink :to="{name: 'registration'}">
@@ -29,18 +29,28 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import { useMainStore } from '@/stores/mainStore';
-import { RouterLink } from 'vue-router';
 import { mapStores } from 'pinia';
+import pb from '@/pocketbase';
 
 export default defineComponent({
 
-    mounted() {
+    async mounted() {
         if (this.mainStore.loggedIn) {
             this.$router.replace({name: 'home'})
         }
         if (this.mainStore.refreshFlag) {
             this.mainStore.refreshFlag = false
             location.reload()
+        }
+        const numSeatsLeftIntermediate = await pb.collection('Participant').getList(1, 300, {
+                filter: 'Paid = true'
+            })
+        this.numSeatsLeft = 300 - numSeatsLeftIntermediate.items.length
+    },
+
+    data() {
+        return {
+            numSeatsLeft: 0
         }
     },
 
