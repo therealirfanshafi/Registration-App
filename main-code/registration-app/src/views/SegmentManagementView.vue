@@ -1,8 +1,8 @@
 <template>
     <main>
         <div id="button-container" v-if="JSON.stringify(oldSegments) !== JSON.stringify(segments)">
-            <button :class="{blue: category == 'Junior', red: category == 'Senior'}" @click="saveChanges(); $router.push({name: 'home'});">Save Changes</button>
-            <button :class="{blue: category == 'Junior', red: category == 'Senior'}" @click="cancel(); $router.push({name: 'home'})">Cancel</button>
+            <button :class="{blue: category == 'Junior', red: category == 'Senior'}" @click="saveChanges()">Save Changes</button>
+            <button :class="{blue: category == 'Junior', red: category == 'Senior'}" @click="cancel()">Cancel</button>
         </div>
         <div id="main-container" :class="{blue: category == 'Junior', red: category == 'Senior'}">
             <h1>Select the segments you want to participate in</h1>
@@ -31,11 +31,15 @@ export default defineComponent({
         }
         if (pb.authStore.model) {
             this.category = (await pb.collection('Category').getOne(pb.authStore.model.Category)).Category
-        }
-        const segmentsIntermediate = await pb.collection('Solo_Segment').getFullList()
-        if (pb.authStore.model) {    
-            this.oldSegments = segmentsIntermediate.map((val) => Object.create({name: val.Name, participate: val.Participants.includes(pb.authStore.model.id), id: val.id}))
-            this.segments = segmentsIntermediate.map((val) => Object.create({name: val.Name, participate: val.Participants.includes(pb.authStore.model.id), id: val.id}))
+
+            const segmentsIntermediate1 = await pb.collection('Solo_Segment_Participant').getFullList({
+                fields: 'id, Segment',
+                filter: `Participant = "${pb.authStore.model.id}"`
+            })
+            const SegmentIDs = segmentsIntermediate1.map((val) => val.Segment)
+            const segmentsIntermediate2 = await pb.collection('Solo_Segment').getFullList()
+            this.oldSegments = segmentsIntermediate2.map((val) => Object.create({name: val.Name, participate: SegmentIDs.includes(val.id), segmentId: val.id, recordId: SegmentIDs.includes(val.id) ? segmentsIntermediate1.filter((val2) => val2.Segment == val.id)[0].id : ''}))
+            this.segments = segmentsIntermediate2.map((val) => Object.create({name: val.Name, participate: SegmentIDs.includes(val.id), segmentId: val.id, recordId: SegmentIDs.includes(val.id) ? segmentsIntermediate1.filter((val2) => val2.Segment == val.id)[0].id : ''}))
         }
 
     },
@@ -45,28 +49,34 @@ export default defineComponent({
 
     data() {
         return {
-            oldSegments: [{name: '', participate: false, id: ''}],
-            segments: [{name: '', participate: false, id: ''}],
+            oldSegments: [{name: '', participate: false, segmentId: '', recordId: ''}],
+            segments: [{name: '', participate: false, segmentId: '', recordId: ''}],
             category: ''
         }
     },
     methods: {
         async saveChanges() {
-            for (let i = 0; i <= this.oldSegments.length; i ++ ) {
+            for (let i = 0; i < this.oldSegments.length; i ++ ) {
                 if (this.oldSegments[i].participate != this.segments[i].participate && this.segments[i].participate) {
-                    await pb.collection('Solo_Segment').update(this.segments[i].id , {
-                        'Participants+': pb.authStore.model.id
-                    })
-                } else if (this.oldSegments[i].participate != this.segments[i].participate && !this.segments[i].participate) {
-                    await pb.collection('Solo_Segment').update(this.segments[i].id , {
-                        'Participants-': pb.authStore.model.id
-                    })
+                    if (pb.authStore.model) {
+                        await pb.collection('Solo_Segment_Participant').create({
+                            Segment: this.oldSegments[i].segmentId,
+                            Participant: pb.authStore.model.id
+                            
+                        })
+                    }
+                } else if (this.oldSegments[i].participate != this.segments[i].participate) {
+                    await pb.collection('Solo_Segment_Participant').delete(this.segments[i].recordId)
+                    this.segments[i].recordId = ''
                 }
             }
-            this.oldSegments = JSON.parse(JSON.stringify(this.segments));
+            this.oldSegments = await JSON.parse(JSON.stringify(this.segments));
+            await this.$router.push({name: 'home'})
+            
         },
         cancel() {
             this.segments = JSON.parse(JSON.stringify(this.oldSegments));
+            this.$router.push({name: 'home'})
         }
     },
     beforeRouteLeave() {

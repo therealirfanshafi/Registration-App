@@ -65,59 +65,66 @@ export default defineComponent({
         }
         if (pb.authStore.model) {
             this.category = (await pb.collection('Category').getOne(pb.authStore.model.Category)).Category
-            const segmentsIntermediate1 = await pb.collection('Participant').getList(1, 5, {
-                fields: "expand.Solo_Segment_via_Participants.Name",
-                filter: `Solo_Segment_via_Participants.Participants ?= "${pb.authStore.model.id}"`,
-                expand: 'Solo_Segment_via_Participants'
+            
+            const segmentIntermediate1 = await pb.collection('Solo_Segment_Participant').getFullList({
+                fields: 'Segment, expand',
+                filter: `Participant = "${pb.authStore.model.id}"`,
+                expand: 'Segment'
             })
-            const groupsIntermediate = await pb.collection('Group').getList(1, 10, {
+
+            const groupsIntermediate = await pb.collection('Group').getFullList({
                 fields: 'id, Name',
                 filter: `Members ?= "${pb.authStore.model.id}"`
             })
-            if (groupsIntermediate.items.length) {
-                this.yourGroups = groupsIntermediate.items.map((val) => val.Name)
-            }   
-            let segmentsIntermediate2: any = await pb.collection('Group').getList(1, 10, {
-                fields: 'expand.Group_Segment_via_Groups.Name',
-                filter: groupsIntermediate.items.map((val) => `Group_Segment_via_Groups ?= "${val.id}"`).join(' || '),
-                expand: 'Group_Segment_via_Groups'
-            })
 
-            if (segmentsIntermediate1.items.length) {
-                this.segments = segmentsIntermediate1.items[0].expand.Solo_Segments_via_Participant.map((val: any) => val.Name)
-            }
-
-            const segmentsIntermediate3: string[] = []
-
-            if (segmentsIntermediate2.items.length) {
-                segmentsIntermediate2 = segmentsIntermediate2.items.map((val1: any) => val1.expand.Group_Segments_via_Group.map((val2: any) => val2.Name))
-
-                segmentsIntermediate2.forEach((element: string[]) => {
-                    segmentsIntermediate3.push(...element)
-                });
+            if (groupsIntermediate.length) {
+                this.yourGroups = groupsIntermediate.map((val) => val.Name)
+            } else {
+                this.yourGroups = []
             }
             
-            this.segments = [...this.segments, ...segmentsIntermediate3]
-            const grpReqIntermediate = await pb.collection('Group_Requests').getList(1, 10, {
-                fields: 'expand.Group.Name',
+
+            const segmentIntermediate2 = await pb.collection('Group_Segment_Group').getFullList({
+                fields: 'Segment, expand',
+                filter: groupsIntermediate.map((val) => `Group = "${val.id}"`).join(' || '),
+                expand: 'Segment',
+            })
+
+            this.segments = []
+            if (segmentIntermediate1.length) {
+                this.segments = [...this.segments ,...segmentIntermediate1.map((val) => val.expand.Segment.Name)]
+            } 
+
+            if (segmentIntermediate2.length) {
+                this.segments = [...this.segments, ...segmentIntermediate2.map((val) => val.expand.Segment.Name)]
+            }
+
+            const grpReqIntermediate = await pb.collection('Group_Requests').getFullList({
+                fields: 'Group',
                 filter: `Participant = "${pb.authStore.model.id}"`,
                 expand: 'Group'
             })
-            if (grpReqIntermediate.items.length) {
-                this.groupRequests = grpReqIntermediate.items.map((val) => val.expand.Group.Name)
+            
+            if (groupsIntermediate.length) {
+                this.groupRequests = grpReqIntermediate.map((val) => val.expand.Group.Name)
+            } else {
+                this.groupRequests = []
             }
+            
+            
+
         }
         const numSeatsLeftIntermediate = await pb.collection('Participant').getList(1, 300, {
                 filter: 'Paid = true'
             })
-            this.numSeatsLeft = 300 - numSeatsLeftIntermediate.items.length
+        this.numSeatsLeft = 300 - numSeatsLeftIntermediate.items.length
     },
 
     data() {
         return {
-            segments: [],
-            groupRequests: [],
-            yourGroups: [],
+            segments: [''],
+            groupRequests: [''],
+            yourGroups: [''],
             projects: [],
             paid: false,
             numSeatsLeft: 0,
