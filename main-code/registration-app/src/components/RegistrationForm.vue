@@ -102,7 +102,7 @@ export default defineComponent({
             grade: '',
             willAvailBus: 'No',
             submitCount: 0,
-            emailsUsed: [],
+            emailsUsed: [''],
             error: false
         }
     },
