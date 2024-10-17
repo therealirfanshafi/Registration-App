@@ -29,6 +29,7 @@
                             </li>
                         </ul>
                         <button :class="{blue: category == 'Junior', red: category == 'Senior'}" @click="deleteGroup(index1)" v-if="item.isAdmin">Delete Group</button>
+                        <p v-else> You are not the admin for this group</p>
                     </div>
                 </div>
             </div>
@@ -37,10 +38,14 @@
                 <div class="card" :class="{blue: category == 'Junior', red: category == 'Senior'}">
                     <div v-for="(item, index1) of segments" :key="index1" class="group-segment-relators">
                         <label :for="item.name">{{ item.name }}</label>
-                        <select :id="item.name" v-model="item.group">
-                            <option value="null">None</option>
-                            <option v-for="(group, index2) of groups" :key="index2" :value="group.name">{{ group.name }}</option>
+                        <select :id="item.name" v-model="item.group" v-if="item.isAdmin || !item.group">
+                            <option :value="null">None</option>
+                            <option v-for="(group, index2) of groups.filter((val) => val.isAdmin)" :key="index2" :value="group.name">{{ group.name }}</option>
                         </select>
+                        <div v-else>
+                            <h3>{{ item.group }}</h3>
+                            <p> You are not the admin for this group</p>
+                        </div>
                     </div>
                     <div id="button-container" v-if="JSON.stringify(oldSegments) !== JSON.stringify(segments)">
                         <button :class="{blue: category == 'Junior', red: category == 'Senior'}" @click="saveChanges()">Save Changes</button>
@@ -74,6 +79,33 @@ export default defineComponent({
             })
             this.groups = groupsIntermediate.map((val) => Object.create({name: val.Name, members: val.expand ? val.expand.Members.map((val2: RecordModel) => val2.First_Name + ' ' + val2.Last_Name) : [], isAdmin: val.Admin == (pb.authStore.model ? pb.authStore.model.id: ''), adminName: val.expand ? val.expand.Admin.First_Name + ' ' + val.expand.Admin.Last_Name : '' ,memberReq: ''}))
 
+            const grpSegmentIntermediate1 = (await pb.collection('Group_Segment').getFullList({
+                fields: 'id, Name'
+            }))
+
+            const grpSegmentIntermediate2 = await pb.collection('Group_Segment_Group').getFullList({
+                fields: 'id, expand',
+                filter: `Group.Members.id ?= "${pb.authStore.model.id}"`,
+                expand: 'Segment, Group'
+            })
+
+            const grpsButNotThis = this.groups
+
+            this.oldSegments = grpSegmentIntermediate1.map((val1) => {
+                const result = {name: val1.Name, group: null, isAdmin: true, segmentID: val1.id, groupID: null, recordID: ''}
+                const temp1 = grpSegmentIntermediate2.find((val2) => (val2.expand ? val2.expand.Segment.Name : '') == val1.Name)
+                if (temp1) {
+                    result.group = temp1.expand ? temp1.expand.Group.Name : null
+                    result.groupID = temp1.expand ? temp1.expand.Group.id : null
+                    result.recordID = temp1.id
+                }
+                const temp2 = grpsButNotThis.find((val2) => val2.name == result.group)
+                result.isAdmin = temp2 ? temp2.isAdmin : true
+                return result
+            })
+
+            this.segments = JSON.parse(JSON.stringify(this.oldSegments))
+
             this.groupList = (await pb.collection('Group').getFullList({
                 fields: 'Name'
             })).map((val) => val.Name.toLowerCase())
@@ -92,8 +124,8 @@ export default defineComponent({
         return {
             groups: [{name: '', members: [''], isAdmin: false, adminName: '', memberReq: ''}],
             groupList: [''],
-            oldSegments: [{name: 'Mathsketeers', group: 'Very Smart Ppl'}, {name: 'Quick Mafs', group: 'I love maths'}, {name: 'Crisis Computerised', group: 'Very Smart People'}, {name: 'Robotics', group: null}],
-            segments: [{name: 'Mathsketeers', group: 'Very Smart Ppl'}, {name: 'Quick Mafs', group: 'I love maths'}, {name: 'Crisis Computerised', group: 'Very Smart People'}, {name: 'Robotics', group: null}],
+            oldSegments: [{name: '', group: null, isAdmin: false, segmentID: '', groupID: null, recordID: null}, {name: '', group: '', isAdmin: false, segmentID: '', groupID: '', recordID: ''}],
+            segments: [{name: '', group: null, isAdmin: false, segmentID: '', groupID: null, recordID: null}, {name: '', group: '', isAdmin: false, segmentID: '', groupID: '', recordID: ''}],
             newGroup: '',
             category: '',
             invalidEmail: false,
@@ -109,7 +141,7 @@ export default defineComponent({
                     Admin: pb.authStore.model.id,
                     Members: [pb.authStore.model.id]
                 })
-                this.groups.push({name: this.newGroup, members: [pb.authStore.model.First_Name + pb.authStore.model.Last_Name], isAdmin: true, adminName: pb.authStore.model.First_Name + ' ' + pb.authStore.model.Last_Name , memberReq: ''})
+                this.groups.push({name: this.newGroup, members: [pb.authStore.model.First_Name + ' ' + pb.authStore.model.Last_Name], isAdmin: true, adminName: pb.authStore.model.First_Name + ' ' + pb.authStore.model.Last_Name , memberReq: ''})
                 this.newGroup = ''
             }
         },
@@ -185,7 +217,25 @@ export default defineComponent({
                 this.groups[index1].members.splice(index2, 1)
             }
         },
-        saveChanges() {
+        async saveChanges() {
+            for (let i = 0; i < this.oldSegments.length; i ++ ) {
+                if (this.oldSegments[i].group != this.segments[i].group && this.segments[i].group) {
+                    if (pb.authStore.model) {
+                        const grp = (await pb.collection('Group').getFullList({
+                            fields: 'id',
+                            filter: `Name = "${this.segments[i].group}"`
+                        }))[0].id
+                        this.segments[i].recordID = (await pb.collection('Group_Segment_Group').create({
+                            Segment: this.oldSegments[i].segmentID,
+                            Group: grp
+                            
+                        })).id
+                    }
+                } else if (this.oldSegments[i].group != this.segments[i].group) {
+                    await pb.collection('Group_Segment_Group').delete(this.segments[i].recordID)
+                    this.segments[i].recordID = ''
+                }
+            }
             this.oldSegments = JSON.parse(JSON.stringify(this.segments));
         },
         cancel() {

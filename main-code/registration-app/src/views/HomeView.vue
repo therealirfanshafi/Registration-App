@@ -91,12 +91,14 @@ export default defineComponent({
             })
 
             this.segments = []
+            this.groupSegements = []
             if (segmentIntermediate1.length) {
                 this.segments = [...this.segments ,...segmentIntermediate1.map((val) => val.expand ? val.expand.Segment.Name : '')]
             } 
 
             if (segmentIntermediate2.length) {
                 this.segments = [...this.segments, ...segmentIntermediate2.map((val) => val.expand ? val.expand.Segment.Name : '')]
+                this.groupSegements = segmentIntermediate2.map((val) => val.expand ? val.expand.Segment.Name : '')
             }
 
             const grpReqIntermediate = await pb.collection('Group_Requests').getFullList({
@@ -124,6 +126,7 @@ export default defineComponent({
     data() {
         return {
             segments: [''],
+            groupSegements: [''],
             groupRequests: [''],
             yourGroups: [''],
             projects: [],
@@ -140,19 +143,45 @@ export default defineComponent({
                 filter: `Name = "${this.groupRequests[index]}"`
             }))[0].id
 
-            await pb.collection('Group').update(grp, {
-                'Members+': pb.authStore.model ? pb.authStore.model.id : ''
-            })
+            console.log(grp)
 
-            const grpReq = (await pb.collection('Group_Requests').getFullList({
-                fields: 'id',
-                filter: `Group = "${grp}" && Participant = "${pb.authStore.model ? pb.authStore.model.id : ''}"`
-            }))[0].id
+            console.log()
 
-            await pb.collection('Group_Requests').delete(grpReq)
+            const thisGrpSegments = (await pb.collection('Group_Segment_Group').getFullList({
+                fields: 'Segment.Name, expand',
+                filter: `Group = "${grp}"`,
+                expand: 'Segment'
+            })).map((val) => val.expand ? val.expand.Segment.Name: '')
 
-            this.yourGroups.push(this.groupRequests[index])
-            this.groupRequests.splice(index, 1)
+            console.log(thisGrpSegments)
+
+            let isValid = true
+            console.log(thisGrpSegments)
+            console.log(this.groupSegements)
+            for (let temp1 of thisGrpSegments) {
+                for (let temp2 of this.groupSegements) {
+                    if (temp1 == temp2) {
+                        isValid = false
+                        alert(`This group is registered for ${temp1} which one of your groups is also registered for. Solve this conflict to accept the group request`)
+                    }
+                }
+            }
+            if (isValid) {
+                await pb.collection('Group').update(grp, {
+                    'Members+': pb.authStore.model ? pb.authStore.model.id : ''
+                })
+
+                const grpReq = (await pb.collection('Group_Requests').getFullList({
+                    fields: 'id',
+                    filter: `Group = "${grp}" && Participant = "${pb.authStore.model ? pb.authStore.model.id : ''}"`
+                }))[0].id
+
+                await pb.collection('Group_Requests').delete(grpReq)
+
+                this.yourGroups.push(this.groupRequests[index])
+                this.groupRequests.splice(index, 1)
+                }
+            
         },
         async rejectReq(index: number) {
             const grpReq = (await pb.collection('Group_Requests').getFullList({
