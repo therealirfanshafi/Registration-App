@@ -88,7 +88,6 @@ export default defineComponent({
                 filter: `Group.Members.id ?= "${pb.authStore.model.id}"`,
                 expand: 'Segment, Group'
             })
-
             const grpsButNotThis = this.groups
 
             this.oldSegments = grpSegmentIntermediate1.map((val1) => {

@@ -38,7 +38,17 @@
         <div class="card" :class="{blue: category == 'Junior', red: category == 'Senior'}" id="submission-card">
             <h1>Submissions</h1>
             <ul v-if="projects.length">
-                <li v-for="(item, index) of projects" :key=index>{{ item }}</li>
+                <li v-for="(item, index) of projects" :key=index>
+                    <div>
+                        {{ item.segment }}
+                    </div>
+                    <div v-if="item.submitted" style="color: green;">
+                        Done
+                    </div>
+                    <div v-else style="color: rgb(189, 129, 18);">
+                        Due
+                    </div>
+                </li>
             </ul>
             <button :class="{blue: category == 'Junior', red: category == 'Senior'}" v-if="projects.length" @click="$router.push({name: 'projectSubmission'})">Manage Submissions</button>
             <h2 v-else>You are not registered for any segment that requires a project submission</h2>
@@ -85,7 +95,7 @@ export default defineComponent({
             
 
             const segmentIntermediate2 = await pb.collection('Group_Segment_Group').getFullList({
-                fields: 'Segment, expand',
+                fields: 'Segment, expand, Submission',
                 filter: groupsIntermediate.map((val) => `Group = "${val.id}"`).join(' || '),
                 expand: 'Segment',
             })
@@ -113,7 +123,11 @@ export default defineComponent({
             } else {
                 this.groupRequests = []
             }
+
+            this.projects = []
+            this.projects = segmentIntermediate2.filter((val) => val.expand ? val.expand.Segment.Requires_Submission : false).map((val) => Object.create({segment: val.expand ? val.expand.Segment.Name: false, submitted: val.Submission !== '' }))
             
+            console.error(Object.create({name: 'hello'}))
             
 
         }
@@ -129,7 +143,7 @@ export default defineComponent({
             groupSegements: [''],
             groupRequests: [''],
             yourGroups: [''],
-            projects: [],
+            projects: [{segment: 'Something', submitted: false}],
             paid: false,
             numSeatsLeft: 0,
             category: ''
@@ -266,7 +280,7 @@ button:hover, button:focus {
     width: 90%;
 }
 
-#grp-req-list li {
+#grp-req-list li, #submission-card li {
     display: flex;
     justify-content: space-between;
 }
@@ -275,6 +289,10 @@ button:hover, button:focus {
     margin-left: 15px;
     border-radius: 100%;
     padding: 2px;
+}
+
+#submission-card ul {
+    width: 80%;
 }
 
 @media screen and (min-width: 635px) {
