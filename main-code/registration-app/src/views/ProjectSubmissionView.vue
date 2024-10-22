@@ -70,18 +70,25 @@ export default defineComponent({
     },
     methods: {
         detectChange(index: number, event: Event) {
-            this.submissions[index].file = event.target ? event.target.files[0] : ''
+            this.submissions[index].file = event.target.files[0]
             this.changed = true
         },
 
         async saveChanges() {
-            for (let project of this.submissions) {
-                if (project.file !== '') {
-                    await pb.collection('Group_Segment_Group').update(project.recordID, {
-                        Submission: project.file
-                    })
+            try {
+                for (let project of this.submissions) {
+                    if (project.file !== '') {
+                        await pb.collection('Group_Segment_Group').update(project.recordID, {
+                            Submission: project.file
+                        })
+                    }
                 }
+
+            } catch {
+                alert('Only presentations, videos and pdfs can be uploaded')
             }
+            this.changed = false
+            this.$router.push({name: 'home'})
             
         },
         cancel() {

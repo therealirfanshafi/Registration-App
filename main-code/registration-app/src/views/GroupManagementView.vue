@@ -19,6 +19,7 @@
                             <button @click="addMember(index1)" :class="{blue: category == 'Junior', red: category == 'Senior'}">Add member</button>
                             <p v-if="invalidEmail">Email does not exist</p>
                             <p v-if="memberAlreadyinGrp">Member already in group</p>
+                            <p v-if="wrongCategory">This member is in a different category from you</p>
                             <p v-if="reqlAlreadySent">Request for this member already sent</p>
                         </div>
                         
@@ -129,6 +130,7 @@ export default defineComponent({
             category: '',
             invalidEmail: false,
             memberAlreadyinGrp: false,
+            wrongCategory: false,
             reqlAlreadySent: false
         }
     },
@@ -147,35 +149,39 @@ export default defineComponent({
         async addMember(index: number) {
             this.invalidEmail = false
             this.memberAlreadyinGrp = false
+            this.wrongCategory = false
             this.reqlAlreadySent = false
 
             
             let member: RecordModel[] | string = (await pb.collection('Participant').getFullList({
-                fields: 'id',
+                fields: 'id, Category',
                 filter: `email = "${this.groups[index].memberReq}"`
             }))
             if (member.length == 0) {
                 this.invalidEmail = true
             } else {
+                const memCategory = member[0].Category
                 member = member[0].id
                 const groupIntermediate = (await pb.collection('Group').getFullList({
-                    fields: 'id, Members',
-                    filter: `Name = "${this.groups[index].name}"`
+                    filter: `Name = "${this.groups[index].name}"`,
+                    expand: 'Admin'
                 }))[0]
                 const grp = groupIntermediate.id
                 const members: string[] = groupIntermediate.Members
                 this.memberAlreadyinGrp = members.includes(member) 
                 if (!this.memberAlreadyinGrp) {
-                    try {
-                        await pb.collection('Group_Requests').create({
-                            Group: grp,
-                            Participant: member
-                        })
-                    } catch {
-                        this.reqlAlreadySent = true
+                    if (memCategory != groupIntermediate.expand.Admin.Category) {
+                        this.wrongCategory = true
+                    } else {
+                        try {
+                            await pb.collection('Group_Requests').create({
+                                Group: grp,
+                                Participant: member
+                            })
+                        } catch {
+                            this.reqlAlreadySent = true
+                        }
                     }
-
-                    
                 }
             }
 
@@ -224,11 +230,16 @@ export default defineComponent({
                             fields: 'id',
                             filter: `Name = "${this.segments[i].group}"`
                         }))[0].id
-                        this.segments[i].recordID = (await pb.collection('Group_Segment_Group').create({
-                            Segment: this.oldSegments[i].segmentID,
-                            Group: grp
-                            
-                        })).id
+                        try {
+                            this.segments[i].recordID = (await pb.collection('Group_Segment_Group').create({
+                                Segment: this.oldSegments[i].segmentID,
+                                Group: grp
+                                
+                            })).id
+                        } catch (error) {
+                            alert(`A member in ${this.segments[i].group} is already registered for ${this.segments[i].name}`)
+                        }
+                        
                     }
                 } else if (this.oldSegments[i].group != this.segments[i].group) {
                     await pb.collection('Group_Segment_Group').delete(this.segments[i].recordID)
