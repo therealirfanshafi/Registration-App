@@ -2,11 +2,11 @@
     <main>
         <div id="contact-form">
             <h1>Contact form</h1>
-            <input type="email" placeholder="Your email">
-            <input type="text" placeholder="Your Name">
-            <input type="text" placeholder="Your school">
-            <textarea placeholder="Message"></textarea>
-            <button style="min-height: 46px; min-width: 143px; margin: 5px; background-color: #444444; color: white; font-size: 1.5rem;">Submit</button>
+            <input type="email" placeholder="Your email" v-model="email">
+            <input type="text" placeholder="Your Name" v-model="name">
+            <input type="text" placeholder="Your school" v-model="school">
+            <textarea placeholder="Message" v-model="message"></textarea>
+            <button style="min-height: 46px; min-width: 143px; margin: 5px; background-color: #444444; color: white; font-size: 1.5rem;" @click="sendMessage()">Submit</button>
         </div>
         <div id="our-socials">
             <h1>Our Socials</h1>
@@ -25,6 +25,45 @@
         </div>
     </main>
 </template>
+
+<script lang="ts">
+import pb from '@/pocketbase';
+import { defineComponent } from 'vue';
+
+export default defineComponent({
+
+    async mounted() {
+        if (pb.authStore.model) {
+            this.school = (await pb.collection('Participant').getOne(pb.authStore.model.id, {expand: 'School'})).expand.School.Name
+        }
+    },
+
+    data() {
+        return {
+            email: pb.authStore.model ? pb.authStore.model.email : '',
+            name: pb.authStore.model ? pb.authStore.model.First_Name + ' ' + pb.authStore.model.Last_Name : '',
+            school: '',
+            message: ''
+        }
+    },
+    methods: {
+        async sendMessage() {
+            if (this.email !== '' && this.name !== '' && this.school !== '' && this.message !== '') {
+                await pb.send("/contact-us", {
+                    method: 'POST',
+                    body: {
+                       "email": this.email,
+                        "name": this.name,
+                        "school": this.school,
+                        "message": this.message
+                    },
+                })
+            }
+        }
+    }
+})
+
+</script>
 
 <style scoped>
     @import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');

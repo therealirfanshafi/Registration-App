@@ -66,7 +66,6 @@ cronAdd('createReports', '0 3 * * *', () => {
             $app.dao().expandRecords(segmentParticipants, ['Group'])
             segmentParticipants = segmentParticipants.map((val) => val.expandedOne('Group'))
             $app.dao().expandRecords(segmentParticipants, ['Members'])
-            console.log(JSON.stringify(segmentParticipants))
             for (let group of segmentParticipants) {
                 $app.dao().expandRecords(group.expandedAll('Members'), ['Category', 'School'])
                 for (let item of group.expandedAll('Members')) {
@@ -76,11 +75,7 @@ cronAdd('createReports', '0 3 * * *', () => {
             segmentRecord.set('Report', json_data)
             $app.dao().saveRecord(segmentRecord)
                
-
-
         }
-
-
 
     } catch(error) {
         console.error(error)
