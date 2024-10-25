@@ -34,7 +34,7 @@ export default defineComponent({
 
     methods: {
         async verify() {
-            pb.collection('Participant').authRefresh()
+            await pb.collection('Participant').authRefresh()
             location.reload()
             
         },
