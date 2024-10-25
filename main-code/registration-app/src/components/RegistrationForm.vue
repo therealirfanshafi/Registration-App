@@ -11,7 +11,7 @@
                     <label for="email">Email</label>
                     <input type="email" id="email" v-model="email" autocomplete="off" :class="{error: !validateEmail && email !== ''}">
                     <p class="error-message" v-if="!validateEmail && email !== ''">Invalid email</p>
-                    <p class="error-message" v-if="!validateEmailUniqueness">Email Already in Use</p>
+                    <p class="error-message" v-if="!validateEmailUniqueness && email !== ''">Email Already in Use</p>
                 </div>
                 <div class="logical-input-group">
                     <label for="phone-number">Phone Number</label>
@@ -36,10 +36,11 @@
                 <div class="logical-input-group">
                     <label for="school">School</label>
                     <select id="school" v-model="school">
-                        <option value="Sunnydale">Sunnydale</option>
-                        <option value="Mastermind">Mastermind</option>
-                        <option value="Scholastica">Scholastica</option>
+                        <option v-for="(item, index) of schoolList" :key="index" :value="item.name">{{item.name}}</option>
+                        <option value="Not Listed">My School is not listed here</option>
                     </select>
+                    <label for="new-school"  v-if="school == 'Not Listed'">Enter your school Name</label>
+                    <input type="text" id="new-school" v-if="school == 'Not Listed'" v-model="newSchool">
                 </div>
 
                 <div class="logical-input-group">
@@ -89,10 +90,15 @@ export default defineComponent({
         emailsUsed.forEach((email) => {
             this.emailsUsed.push(email.email)
         })
+
+        const schoolIntermediates = await pb.collection('Schools').getFullList({sort: 'Name'})
+        this.schoolList = schoolIntermediates.map((val) => Object.create({name: val.Name, id: val.id}))
+
     },
 
     data() {
         return {
+            schoolList: [{name: '', id: ''}],
             fullName: '',
             email: '',
             phoneNumber: '+880',
@@ -103,7 +109,8 @@ export default defineComponent({
             willAvailBus: 'No',
             submitCount: 0,
             emailsUsed: [''],
-            error: false
+            error: false,
+            newSchool: ''
         }
     },
 
@@ -115,14 +122,20 @@ export default defineComponent({
                 const category_id = (await pb.collection('Category').getList(1, 30, {
                     filter: `Class = "${this.grade}"`
                 })).items[0].id
-                console.error(category_id)
                 try {
+                    let schoolID: string
+                    if (this.school == 'Not Listed') {
+                        schoolID = (await pb.collection('Schools').create({Name: this.newSchool})).id
+                    } else {
+                        schoolID = this.schoolList.find((val) => val.name == this.school).id
+                    }
+
                     await pb.collection('Participant').create({
                         email: this.email,
                         emailVisibility: true,
                         First_Name: this.fullName.split(' ').slice(0, -1).join(' '),
                         Last_Name: this.fullName.split(' ').pop(),
-                        School: this.school,
+                        School: schoolID,
                         Category: category_id,
                         Phone_Number: this.phoneNumber,
                         password: this.password,
