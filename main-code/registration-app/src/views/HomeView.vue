@@ -96,7 +96,7 @@ export default defineComponent({
 
             const segmentIntermediate2 = await pb.collection('Group_Segment_Group').getFullList({
                 fields: 'Segment, expand, Submission',
-                filter: groupsIntermediate.map((val) => `Group = "${val.id}"`).join(' || '),
+                filter: `Group.Members.id ?= "${pb.authStore.model.id}"`,
                 expand: 'Segment',
             })
 
