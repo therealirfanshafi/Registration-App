@@ -237,6 +237,8 @@ export default defineComponent({
                                 
                             })).id
                         } catch (error) {
+                            console.error(error.message)
+                            this.segments[i].group = this.oldSegments[i].group
                             alert(`A member in ${this.segments[i].group} is already registered for ${this.segments[i].name}`)
                         }
                         
