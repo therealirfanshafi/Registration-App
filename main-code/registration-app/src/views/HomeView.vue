@@ -6,7 +6,7 @@
             <h2 style="text-align: center;" v-if="!paid">Complete the payment to earn your spot in the fest</h2>
             <p v-if="!paid">{{ numSeatsLeft }} seats left</p>
             <h2 v-else>You have completed the payment. Enjoy the fest</h2>
-            <button :class="{blue: category == 'Junior', red: category == 'Senior'}" @click="$router.push({name: 'payment'})">Complete Payment</button>
+            <button :class="{blue: category == 'Junior', red: category == 'Senior'}" @click="$router.push({name: 'payment'})" v-if="!paid">Complete Payment</button>
         </div>
         <div class="card" :class="{blue: category == 'Junior', red: category == 'Senior'}" id="segment-card">
             <h1>Your Segments</h1>

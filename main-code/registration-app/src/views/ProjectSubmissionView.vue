@@ -1,15 +1,17 @@
 <template>
     <main>
-        <div id="button-container" v-if="changed">
+        <div id="button-container" v-if="JSON.stringify(oldSubmissions) !== JSON.stringify(submissions)">
             <button :class="{blue: category == 'Junior', red: category == 'Senior'}" @click="saveChanges()">Save Changes</button>
             <button :class="{blue: category == 'Junior', red: category == 'Senior'}" @click="cancel()">Cancel</button>
         </div>
         <div id="main-container" :class="{blue: category == 'Junior', red: category == 'Senior'}">
             <h1>Upload / Change your project for the following segments</h1>
-            <div v-for="(item, index) of submissions.filter((val) => val.isAdmin)" :key="index" class="segment-checkboxes">
-                <label :for="item.name">{{ item.name }}</label>
-                <input type="file" :id="item.name" :ref="item.name" @change="detectChange(index, $event)">
-                <a :href="item.fileUrl" v-if="item.fileUrl !== ''">View current submission</a>
+            <div v-for="(item, index) of submissions.filter((val) => val.isAdmin)" :key="index" class="segments">
+                <p>{{ item.name }}</p>
+                <div class="logical-input-group">
+                    <label :for="item.name">Google Drive Link of File(s)</label>
+                    <input type="url" :id="item.name" v-model="item.link">
+                </div>
             </div>
             <h2 v-if="submissions.filter((val) => !val.isAdmin).length">You are not the admin for the following segments</h2>
             <div>
@@ -43,12 +45,18 @@ export default defineComponent({
                 expand: 'Segment, Group'
             })
 
+            this.oldSubmissions = subIntermediate.map((val) => Object.create({
+                name: val.expand ? val.expand.Segment.Name : '', 
+                isAdmin: val.expand ? val.expand.Group.Admin == (pb.authStore.model ? pb.authStore.model.id : '') : false,
+                link: val.Submission,
+                recordID: val.id
+
+            }))
 
             this.submissions = subIntermediate.map((val) => Object.create({
                 name: val.expand ? val.expand.Segment.Name : '', 
                 isAdmin: val.expand ? val.expand.Group.Admin == (pb.authStore.model ? pb.authStore.model.id : '') : false,
-                fileUrl: val.Submission !== '' ? `${pb.baseUrl}/api/files/${val.collectionId}/${val.id}/${val.Submission}` : '' ,
-                file: '',
+                link: val.Submission,
                 recordID: val.id
 
             }))
@@ -58,37 +66,31 @@ export default defineComponent({
        
     },
     computed: {
+
         ...mapStores(useMainStore)
     },
 
     data() {
         return {
-            submissions: [{name: '', isAdmin: false, fileUrl: '', file: '', recordID: ''}],
+            oldSubmissions: [{name: '', isAdmin: false, link: '', recordID: ''}],
+            submissions: [{name: '', isAdmin: false, link: '', recordID: ''}],
             category: '',
-            changed: false
         }
     },
     methods: {
-        detectChange(index: number, event: Event) {
-            this.submissions[index].file = event.target.files[0]
-            this.changed = true
-        },
-
         async saveChanges() {
             try {
                 for (let project of this.submissions) {
-                    if (project.file !== '') {
-                        await pb.collection('Group_Segment_Group').update(project.recordID, {
-                            Submission: project.file
-                        })
-                    }
+                    await pb.collection('Group_Segment_Group').update(project.recordID, {
+                        Submission: project.link
+                    })
                 }
-
+                this.oldSubmissions = JSON.parse(JSON.stringify(this.submissions))
+                this.$router.push({name: 'home'})
+            
             } catch {
-                alert('Only presentations, videos and pdfs can be uploaded')
+                alert('Only google drive links can be input')
             }
-            this.changed = false
-            this.$router.push({name: 'home'})
             
         },
         cancel() {
@@ -96,7 +98,7 @@ export default defineComponent({
         }
     },
     beforeRouteLeave() {
-        if (this.changed) {
+        if (JSON.stringify(this.oldSubmissions) !== JSON.stringify(this.submissions)) {
             if (confirm("Do you want to save changes")) {
                 this.saveChanges()
             }
@@ -132,6 +134,10 @@ li {
     list-style: none;
 }
 
+label {
+    font-size: 1rem;
+}
+
 #main-container {
     margin-top: 200px;
     margin-bottom: 200px;
@@ -161,18 +167,21 @@ li {
 }
 
 
-.segment-checkboxes, .segment-checkboxes div{
+.segments, .segments div{
     display: flex;
     flex-direction: column;
 }
 
-.segment-checkboxes {
+.segments {
     margin: 20px;
     width: 100%;
 }
 
+.logical-input-group {
+    flex-direction: column;
+}
 
-@media screen and (min-width: 620px) {
+@media screen and (min-width: 700px) {
     main {
         font-size: 1.5rem;
     }
@@ -194,7 +203,7 @@ li {
         color: white;
     }
 
-    .segment-checkboxes {
+    .segments {
         flex-direction: row;
         justify-content: space-between;
         flex-wrap: wrap;
