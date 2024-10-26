@@ -58,6 +58,8 @@ export default defineComponent({
                         "message": this.message
                     },
                 })
+                this.message = ''
+                alert('Email has been sent')
             }
         }
     }
