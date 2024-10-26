@@ -22,9 +22,7 @@ export default defineComponent({
         } else if (!this.mainStore.verified) {
             this.$router.replace({name: 'verification'})
         }
-        if (pb.authStore.model) {
-            this.category = (await pb.collection('Category').getOne(pb.authStore.model.Category)).Category
-        }
+        this.category = (await pb.collection('Category').getOne(pb.authStore.model.Category)).Category
     },
 
     data() {

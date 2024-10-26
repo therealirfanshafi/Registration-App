@@ -68,67 +68,66 @@ import { defineComponent } from 'vue';
 export default defineComponent({
 
     async mounted() {
-        if (!this.mainStore.loggedIn) {
-            this.$router.replace({name: 'login'})
-        } else if (!this.mainStore.verified) {
-            this.$router.replace({name: 'verification'})
+    if (!this.mainStore.loggedIn) {
+        this.$router.replace({name: 'login'})
+    } else if (!this.mainStore.verified) {
+        this.$router.replace({name: 'verification'})
+    }
+    
+        this.category = (await pb.collection('Category').getOne(pb.authStore.model.Category)).Category
+        
+        const segmentIntermediate1 = await pb.collection('Solo_Segment_Participant').getFullList({
+            fields: 'Segment, expand',
+            filter: `Participant = "${pb.authStore.model.id}"`,
+            expand: 'Segment'
+        })
+
+        const groupsIntermediate = await pb.collection('Group').getFullList({
+            fields: 'id, Name',
+            filter: `Members.id ?= "${pb.authStore.model.id}"`
+        })
+
+        if (groupsIntermediate.length) {
+            this.yourGroups = groupsIntermediate.map((val) => val.Name)
+        } else {
+            this.yourGroups = []
         }
-        if (pb.authStore.model) {
-            this.category = (await pb.collection('Category').getOne(pb.authStore.model.Category)).Category
-            
-            const segmentIntermediate1 = await pb.collection('Solo_Segment_Participant').getFullList({
-                fields: 'Segment, expand',
-                filter: `Participant = "${pb.authStore.model.id}"`,
-                expand: 'Segment'
-            })
+        
 
-            const groupsIntermediate = await pb.collection('Group').getFullList({
-                fields: 'id, Name',
-                filter: `Members.id ?= "${pb.authStore.model.id}"`
-            })
+        const segmentIntermediate2 = await pb.collection('Group_Segment_Group').getFullList({
+            fields: 'Segment, expand, Submission',
+            filter: `Group.Members.id ?= "${pb.authStore.model.id}"`,
+            expand: 'Segment',
+        })
 
-            if (groupsIntermediate.length) {
-                this.yourGroups = groupsIntermediate.map((val) => val.Name)
-            } else {
-                this.yourGroups = []
-            }
-            
+        this.segments = []
+        this.groupSegements = []
+        if (segmentIntermediate1.length) {
+            this.segments = [...this.segments ,...segmentIntermediate1.map((val) => val.expand.Segment.Name )]
+        } 
 
-            const segmentIntermediate2 = await pb.collection('Group_Segment_Group').getFullList({
-                fields: 'Segment, expand, Submission',
-                filter: `Group.Members.id ?= "${pb.authStore.model.id}"`,
-                expand: 'Segment',
-            })
-
-            this.segments = []
-            this.groupSegements = []
-            if (segmentIntermediate1.length) {
-                this.segments = [...this.segments ,...segmentIntermediate1.map((val) => val.expand ? val.expand.Segment.Name : '')]
-            } 
-
-            if (segmentIntermediate2.length) {
-                this.segments = [...this.segments, ...segmentIntermediate2.map((val) => val.expand ? val.expand.Segment.Name : '')]
-                this.groupSegements = segmentIntermediate2.map((val) => val.expand ? val.expand.Segment.Name : '')
-            }
-
-            const grpReqIntermediate = await pb.collection('Group_Requests').getFullList({
-                fields: 'expand',
-                filter: `Participant = "${pb.authStore.model.id}"`,
-                expand: 'Group'
-            })
-            
-
-            if (grpReqIntermediate.length) {
-                this.groupRequests = grpReqIntermediate.map((val) => val.expand ? val.expand.Group.Name : '')
-            } else {
-                this.groupRequests = []
-            }
-
-            this.projects = []
-            this.projects = segmentIntermediate2.filter((val) => val.expand ? val.expand.Segment.Requires_Submission : false).map((val) => Object.create({segment: val.expand ? val.expand.Segment.Name: false, submitted: val.Submission !== '' }))
-            
-
+        if (segmentIntermediate2.length) {
+            this.segments = [...this.segments, ...segmentIntermediate2.map((val) => val.expand.Segment.Name)]
+            this.groupSegements = segmentIntermediate2.map((val) => val.expand.Segment.Name)
         }
+
+        const grpReqIntermediate = await pb.collection('Group_Requests').getFullList({
+            fields: 'expand',
+            filter: `Participant = "${pb.authStore.model.id}"`,
+            expand: 'Group'
+        })
+        
+
+        if (grpReqIntermediate.length) {
+            this.groupRequests = grpReqIntermediate.map((val) => val.expand.Group.Name)
+        } else {
+            this.groupRequests = []
+        }
+
+        this.projects = []
+        this.projects = segmentIntermediate2.filter((val) => val.expand.Segment.Requires_Submission).map((val) => Object.create({segment: val.expand.Segment.Name, submitted: val.Submission !== '' }))
+            
+
         const numSeatsLeftIntermediate = await pb.collection('Participant').getList(1, 300, {
                 filter: 'Paid = true'
             })
@@ -166,7 +165,7 @@ export default defineComponent({
                 fields: 'Segment.Name, expand',
                 filter: `Group = "${grp}"`,
                 expand: 'Segment'
-            })).map((val) => val.expand ? val.expand.Segment.Name: '')
+            })).map((val) => val.expand.Segment.Name)
 
             console.log(thisGrpSegments)
 
@@ -183,12 +182,12 @@ export default defineComponent({
             }
             if (isValid) {
                 await pb.collection('Group').update(grp, {
-                    'Members+': pb.authStore.model ? pb.authStore.model.id : ''
+                    'Members+':  pb.authStore.model.id
                 })
 
                 const grpReq = (await pb.collection('Group_Requests').getFullList({
                     fields: 'id',
-                    filter: `Group = "${grp}" && Participant = "${pb.authStore.model ? pb.authStore.model.id : ''}"`
+                    filter: `Group = "${grp}" && Participant = "${pb.authStore.model.id}"`
                 }))[0].id
 
                 await pb.collection('Group_Requests').delete(grpReq)
@@ -201,7 +200,7 @@ export default defineComponent({
         async rejectReq(index: number) {
             const grpReq = (await pb.collection('Group_Requests').getFullList({
                 fields: 'id',
-                filter: `Group.Name = "${this.groupRequests[index]}" && Participant = "${pb.authStore.model ? pb.authStore.model.id : ''}"`,
+                filter: `Group.Name = "${this.groupRequests[index]}" && Participant = "${pb.authStore.model.id}"`,
                 expand: 'Group'
             }))[0].id
 

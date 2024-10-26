@@ -37,31 +37,31 @@ export default defineComponent({
     async mounted() {
         if (!this.mainStore.loggedIn) {
             this.$router.replace({name: 'login'})
+        } else if (!this.mainStore.verified) {
+            this.$router.replace({name: 'verification'})
         }
-        if (pb.authStore.model) {
-            this.category = (await pb.collection('Category').getOne(pb.authStore.model.Category)).Category
-            const subIntermediate = await pb.collection('Group_Segment_Group').getFullList({
-                filter: `Group.Members.id ?= "${pb.authStore.model.id}" && Segment.Requires_Submission = true`,
-                expand: 'Segment, Group'
-            })
 
-            this.oldSubmissions = subIntermediate.map((val) => Object.create({
-                name: val.expand ? val.expand.Segment.Name : '', 
-                isAdmin: val.expand ? val.expand.Group.Admin == (pb.authStore.model ? pb.authStore.model.id : '') : false,
-                link: val.Submission,
-                recordID: val.id
+        this.category = (await pb.collection('Category').getOne(pb.authStore.model.Category)).Category
+        const subIntermediate = await pb.collection('Group_Segment_Group').getFullList({
+            filter: `Group.Members.id ?= "${pb.authStore.model.id}" && Segment.Requires_Submission = true`,
+            expand: 'Segment, Group'
+        })
 
-            }))
+        this.oldSubmissions = subIntermediate.map((val) => Object.create({
+            name: val.expand.Segment.Name, 
+            isAdmin: val.expand.Group.Admin == (pb.authStore.model.id),
+            link: val.Submission,
+            recordID: val.id
 
-            this.submissions = subIntermediate.map((val) => Object.create({
-                name: val.expand ? val.expand.Segment.Name : '', 
-                isAdmin: val.expand ? val.expand.Group.Admin == (pb.authStore.model ? pb.authStore.model.id : '') : false,
-                link: val.Submission,
-                recordID: val.id
+        }))
 
-            }))
+        this.submissions = subIntermediate.map((val) => Object.create({
+            name: val.expand.Segment.Name , 
+            isAdmin: val.expand.Group.Admin == (pb.authStore.model.id) ,
+            link: val.Submission,
+            recordID: val.id
 
-        }
+        }))
 
        
     },

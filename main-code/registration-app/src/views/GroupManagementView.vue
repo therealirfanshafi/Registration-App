@@ -72,44 +72,42 @@ export default defineComponent({
         } else if (!this.mainStore.verified) {
             this.$router.replace({name: 'verification'})
         }
-        if (pb.authStore.model) {
-            this.category = (await pb.collection('Category').getOne(pb.authStore.model.Category)).Category
-            const groupsIntermediate = await pb.collection('Group').getFullList({
-                expand: 'Admin, Members',
-                filter: `Members.id ?= "${pb.authStore.model.id}"`
-            })
-            this.groups = groupsIntermediate.map((val) => Object.create({name: val.Name, members: val.expand ? val.expand.Members.map((val2: RecordModel) => val2.First_Name + ' ' + val2.Last_Name) : [], isAdmin: val.Admin == (pb.authStore.model ? pb.authStore.model.id: ''), adminName: val.expand ? val.expand.Admin.First_Name + ' ' + val.expand.Admin.Last_Name : '' ,memberReq: ''}))
+        this.category = (await pb.collection('Category').getOne(pb.authStore.model.Category)).Category
+        const groupsIntermediate = await pb.collection('Group').getFullList({
+            expand: 'Admin, Members',
+            filter: `Members.id ?= "${pb.authStore.model.id}"`
+        })
+        this.groups = groupsIntermediate.map((val) => Object.create({name: val.Name, members:  val.expand.Members.map((val2: RecordModel) => val2.First_Name + ' ' + val2.Last_Name), isAdmin: val.Admin == pb.authStore.model.id, adminName: val.expand.Admin.First_Name + ' ' + val.expand.Admin.Last_Name, memberReq: ''}))
 
-            const grpSegmentIntermediate1 = (await pb.collection('Group_Segment').getFullList({
-                fields: 'id, Name'
-            }))
+        const grpSegmentIntermediate1 = (await pb.collection('Group_Segment').getFullList({
+            fields: 'id, Name'
+        }))
 
-            const grpSegmentIntermediate2 = await pb.collection('Group_Segment_Group').getFullList({
-                fields: 'id, expand',
-                filter: `Group.Members.id ?= "${pb.authStore.model.id}"`,
-                expand: 'Segment, Group'
-            })
-            const grpsButNotThis = this.groups
+        const grpSegmentIntermediate2 = await pb.collection('Group_Segment_Group').getFullList({
+            fields: 'id, expand',
+            filter: `Group.Members.id ?= "${pb.authStore.model.id}"`,
+            expand: 'Segment, Group'
+        })
+        const grpsButNotThis = this.groups
 
-            this.oldSegments = grpSegmentIntermediate1.map((val1) => {
-                const result = {name: val1.Name, group: null, isAdmin: true, segmentID: val1.id, groupID: null, recordID: ''}
-                const temp1 = grpSegmentIntermediate2.find((val2) => (val2.expand ? val2.expand.Segment.Name : '') == val1.Name)
-                if (temp1) {
-                    result.group = temp1.expand ? temp1.expand.Group.Name : null
-                    result.groupID = temp1.expand ? temp1.expand.Group.id : null
-                    result.recordID = temp1.id
-                }
-                const temp2 = grpsButNotThis.find((val2) => val2.name == result.group)
-                result.isAdmin = temp2 ? temp2.isAdmin : true
-                return result
-            })
+        this.oldSegments = grpSegmentIntermediate1.map((val1) => {
+            const result = {name: val1.Name, group: null, isAdmin: true, segmentID: val1.id, groupID: null, recordID: ''}
+            const temp1 = grpSegmentIntermediate2.find((val2) => (val2.expand.Segment.Name) == val1.Name)
+            if (temp1) {
+                result.group = temp1.expand.Group.Name
+                result.groupID = temp1.expand.Group.id
+                result.recordID = temp1.id
+            }
+            const temp2 = grpsButNotThis.find((val2) => val2.name == result.group)
+            result.isAdmin = temp2 ? temp2.isAdmin : true
+            return result
+        })
 
-            this.segments = JSON.parse(JSON.stringify(this.oldSegments))
+        this.segments = JSON.parse(JSON.stringify(this.oldSegments))
 
-            this.groupList = (await pb.collection('Group').getFullList({
-                fields: 'Name'
-            })).map((val) => val.Name.toLowerCase())
-        }
+        this.groupList = (await pb.collection('Group').getFullList({
+            fields: 'Name'
+        })).map((val) => val.Name.toLowerCase())
     },
 
     computed: {
@@ -136,7 +134,7 @@ export default defineComponent({
     },
     methods: {
         async createNewGroup() {
-            if (this.validateGroupName && pb.authStore.model) {
+            if (this.validateGroupName) {
                 await pb.collection('Group').create({
                     Name: this.newGroup,
                     Admin: pb.authStore.model.id,
@@ -225,23 +223,20 @@ export default defineComponent({
         async saveChanges() {
             for (let i = 0; i < this.oldSegments.length; i ++ ) {
                 if (this.oldSegments[i].group != this.segments[i].group && this.segments[i].group) {
-                    if (pb.authStore.model) {
-                        const grp = (await pb.collection('Group').getFullList({
-                            fields: 'id',
-                            filter: `Name = "${this.segments[i].group}"`
-                        }))[0].id
-                        try {
-                            this.segments[i].recordID = (await pb.collection('Group_Segment_Group').create({
-                                Segment: this.oldSegments[i].segmentID,
-                                Group: grp
-                                
-                            })).id
-                        } catch (error) {
-                            console.error(error.message)
-                            this.segments[i].group = this.oldSegments[i].group
-                            alert(`A member in ${this.segments[i].group} is already registered for ${this.segments[i].name}`)
-                        }
-                        
+                    const grp = (await pb.collection('Group').getFullList({
+                        fields: 'id',
+                        filter: `Name = "${this.segments[i].group}"`
+                    }))[0].id
+                    try {
+                        this.segments[i].recordID = (await pb.collection('Group_Segment_Group').create({
+                            Segment: this.oldSegments[i].segmentID,
+                            Group: grp
+                            
+                        })).id
+                    } catch (error) {
+                        console.error(error)
+                        this.segments[i].group = this.oldSegments[i].group
+                        alert(`A member in ${this.segments[i].group} is already registered for ${this.segments[i].name}`)
                     }
                 } else if (this.oldSegments[i].group != this.segments[i].group) {
                     await pb.collection('Group_Segment_Group').delete(this.segments[i].recordID)

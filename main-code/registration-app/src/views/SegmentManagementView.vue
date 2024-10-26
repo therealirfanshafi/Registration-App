@@ -28,19 +28,21 @@ export default defineComponent({
     async mounted() {
         if (!this.mainStore.loggedIn) {
             this.$router.replace({name: 'login'})
+        } else if (!this.mainStore.verified) {
+            this.$router.replace({name: 'verification'})
         }
-        if (pb.authStore.model) {
-            this.category = (await pb.collection('Category').getOne(pb.authStore.model.Category)).Category
 
-            const segmentsIntermediate1 = await pb.collection('Solo_Segment_Participant').getFullList({
-                fields: 'id, Segment',
-                filter: `Participant = "${pb.authStore.model.id}"`
-            })
-            const SegmentIDs = segmentsIntermediate1.map((val) => val.Segment)
-            const segmentsIntermediate2 = await pb.collection('Solo_Segment').getFullList()
-            this.oldSegments = segmentsIntermediate2.map((val) => Object.create({name: val.Name, participate: SegmentIDs.includes(val.id), segmentId: val.id, recordId: SegmentIDs.includes(val.id) ? segmentsIntermediate1.filter((val2) => val2.Segment == val.id)[0].id : ''}))
-            this.segments = segmentsIntermediate2.map((val) => Object.create({name: val.Name, participate: SegmentIDs.includes(val.id), segmentId: val.id, recordId: SegmentIDs.includes(val.id) ? segmentsIntermediate1.filter((val2) => val2.Segment == val.id)[0].id : ''}))
-        }
+        this.category = (await pb.collection('Category').getOne(pb.authStore.model.Category)).Category
+
+        const segmentsIntermediate1 = await pb.collection('Solo_Segment_Participant').getFullList({
+            fields: 'id, Segment',
+            filter: `Participant = "${pb.authStore.model.id}"`
+        })
+        const SegmentIDs = segmentsIntermediate1.map((val) => val.Segment)
+        const segmentsIntermediate2 = await pb.collection('Solo_Segment').getFullList()
+        this.oldSegments = segmentsIntermediate2.map((val) => Object.create({name: val.Name, participate: SegmentIDs.includes(val.id), segmentId: val.id, recordId: SegmentIDs.includes(val.id) ? segmentsIntermediate1.filter((val2) => val2.Segment == val.id)[0].id : ''}))
+        this.segments = segmentsIntermediate2.map((val) => Object.create({name: val.Name, participate: SegmentIDs.includes(val.id), segmentId: val.id, recordId: SegmentIDs.includes(val.id) ? segmentsIntermediate1.filter((val2) => val2.Segment == val.id)[0].id : ''}))
+
 
     },
     computed: {
@@ -58,13 +60,11 @@ export default defineComponent({
         async saveChanges() {
             for (let i = 0; i < this.oldSegments.length; i ++ ) {
                 if (this.oldSegments[i].participate != this.segments[i].participate && this.segments[i].participate) {
-                    if (pb.authStore.model) {
-                        await pb.collection('Solo_Segment_Participant').create({
-                            Segment: this.oldSegments[i].segmentId,
-                            Participant: pb.authStore.model.id
-                            
-                        })
-                    }
+                    await pb.collection('Solo_Segment_Participant').create({
+                        Segment: this.oldSegments[i].segmentId,
+                        Participant: pb.authStore.model.id
+                        
+                    })
                 } else if (this.oldSegments[i].participate != this.segments[i].participate) {
                     await pb.collection('Solo_Segment_Participant').delete(this.segments[i].recordId)
                     this.segments[i].recordId = ''
