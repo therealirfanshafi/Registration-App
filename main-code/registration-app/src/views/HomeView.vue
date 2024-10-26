@@ -127,14 +127,15 @@ export default defineComponent({
             this.projects = []
             this.projects = segmentIntermediate2.filter((val) => val.expand ? val.expand.Segment.Requires_Submission : false).map((val) => Object.create({segment: val.expand ? val.expand.Segment.Name: false, submitted: val.Submission !== '' }))
             
-            console.error(Object.create({name: 'hello'}))
-            
 
         }
         const numSeatsLeftIntermediate = await pb.collection('Participant').getList(1, 300, {
                 filter: 'Paid = true'
             })
         this.numSeatsLeft = 300 - numSeatsLeftIntermediate.items.length
+
+        this.paid = (await pb.collection('Participant').getOne(pb.authStore.model.id)).Paid
+
     },
 
     data() {

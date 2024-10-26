@@ -1,7 +1,8 @@
 <template>
     <main>
         <div :class="{blue: category == 'Junior', red: category == 'Senior'}">
-            <h1 style="text-align: center;">Complete Payment using bkash</h1>
+            <h1 style="text-align: center;">Complete Payment by clicking the button below. The registration is fee is 2000 tk. Once paid your spot in the fest will be confirmed</h1>
+            <button :class="{blue: category == 'Junior', red: category == 'Senior'}" @click="completePayment()">Complete payment</button>
         </div>
     </main>
 </template>
@@ -34,6 +35,15 @@ export default defineComponent({
 
     computed: {
         ...mapStores(useMainStore)
+    },
+
+    methods: {
+        async completePayment() {
+            const res = await pb.send('/pay', {
+                method: 'POST'
+            })
+            window.location = res.url
+        }
     }
 })
 
@@ -54,4 +64,18 @@ div {
     flex-direction: column;
     align-items: center;
 }
+
+button {
+    color: white;
+    border: none;
+    font-size: 1.5rem;
+    align-self: center;
+    padding: 5px;
+    min-width: 160px;
+}
+
+button:hover, button:focus {
+    cursor: pointer;
+}
+
 </style>
