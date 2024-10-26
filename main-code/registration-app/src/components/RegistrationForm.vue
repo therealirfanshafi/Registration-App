@@ -2,6 +2,7 @@
     <main>
         <h1 id="title">Sign Up</h1>
         <form class="multi-bg" @submit.prevent="createNewUser()">
+            <h3 style="text-align: center; color: rgb(250, 179, 0);">Warning: You cannnot change any information once you create the account.</h3>
             <div class="logical-input-group">
                 <label for="full-name">Full Name</label>
                 <input type="text" id="full-name" v-model="fullName" autocomplete="off">
@@ -163,7 +164,7 @@ export default defineComponent({
         },
 
         validatePhoneNum() {
-            const regExp = /^\+?[0-9-]*[0-9]{11,}$/
+            const regExp = /(^(\+88|0088)?(01){1}[3456789]{1}(\d){8})$/
             return regExp.test(this.phoneNumber)
         },
 

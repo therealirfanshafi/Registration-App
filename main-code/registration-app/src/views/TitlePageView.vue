@@ -1,6 +1,7 @@
 <template>
     <main class="column-centering">
-        <h1>Sunnydale Math x Tech Fest 3</h1>
+        <h1>Sunnydale Math x Tech & Robotics Fest III</h1>
+        <h3>Presented by: <br>Sunnydale Math x Tech Club & Sunnydale Robotics Club</h3>
         <h2>
             The fate of the world rests on your shoulders
         </h2>
@@ -78,7 +79,7 @@ button {
     padding: 10px;
 }
 
-h1, h2 {
+h1, h2, h3 {
     font-style: normal;
     font-optical-sizing: auto;
     text-align: center;
@@ -89,13 +90,19 @@ h1 {
     font-size: 3rem;
     color: #35984E;
     margin-top: 150px;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
 }
 
 h2 {
     font-family: "Lexend Mega", sans-serif;
     color: #ED9797;
     font-size: 1.5rem;
+}
+
+h3 {
+    font-size: 1rem;
+    color: #50ad33;
+    margin-bottom: 30px;
 }
 
 p {
@@ -131,6 +138,10 @@ p {
 
     h2 {
         font-size: 2rem;
+    }
+
+    h3 {
+        font-size: 1.5rem;
     }
 
     p {
