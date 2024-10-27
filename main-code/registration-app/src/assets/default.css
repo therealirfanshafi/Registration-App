@@ -1,69 +1,133 @@
 @import url('https://fonts.googleapis.com/css2?family=Aldrich&display=swap');
 
- * {
-    margin: 0;
-    padding: 0;
-    font-weight: 400;
-    box-sizing: border-box;
+* {
+  margin: 0;
+  padding: 0;
+  font-weight: 400;
+  box-sizing: border-box;
 }
 
 html {
-    font-family: "Aldrich", sans-serif;
-    font-style: normal;
-    font-size: 16px;
-    color: white;
+  font-family: 'Aldrich', sans-serif;
+  font-style: normal;
+  font-size: 16px;
+  color: white;
+}
+
+main,
+.column-centering {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+li {
+  list-style-type: none;
+}
+
+.default-button,
+#button-container .default-button {
+  color: white;
+  border: none;
+  font-size: 1.5rem;
+  align-self: center;
+  padding: 5px;
+  min-width: 160px;
+}
+
+button:hover,
+button:focus {
+  cursor: pointer;
 }
 
 .multi-bg {
-    background: linear-gradient(to right, rgb(194, 53, 53, 0.47) 0%, rgb(194, 53, 53, 0.47) 50%, rgb(52, 9, 160, 0.47) 50%, rgb(52, 9, 160, 0.47) 100%);
-    font-family: "Aldrich", sans-serif;
-    color: white;
+  background: linear-gradient(
+    to right,
+    rgb(194, 53, 53, 0.47) 0%,
+    rgb(194, 53, 53, 0.47) 50%,
+    rgb(52, 9, 160, 0.47) 50%,
+    rgb(52, 9, 160, 0.47) 100%
+  );
+  font-family: 'Aldrich', sans-serif;
+  color: white;
 }
 
 button.multi-bg:hover {
-    background: linear-gradient(to right, rgba(165, 34, 34, 0.47) 0%, rgb(165, 34, 34, 0.47) 50%, rgb(38, 3, 124, 0.47) 50%, rgb(38, 3, 124, 0.47) 100%);
-    cursor: pointer;
+  background: linear-gradient(
+    to right,
+    rgba(165, 34, 34, 0.47) 0%,
+    rgb(165, 34, 34, 0.47) 50%,
+    rgb(38, 3, 124, 0.47) 50%,
+    rgb(38, 3, 124, 0.47) 100%
+  );
+  cursor: pointer;
 }
 
 .blue {
-    background-color: rgb(81, 42, 198, 0.4);
+  background-color: rgb(81, 42, 198, 0.4);
 }
 
 button.blue {
-    background-color: rgb(51, 18, 116, 0.6);
+  background-color: rgb(51, 18, 116, 0.6);
 }
 
-button.blue:hover, button.blue:focus {
-    background-color: rgba(35, 7, 89, 0.6);
+button.blue:hover,
+button.blue:focus {
+  background-color: rgba(35, 7, 89, 0.6);
 }
 
 .red {
-    background-color: rgba(198, 42, 42, 0.4);
+  background-color: rgba(198, 42, 42, 0.4);
 }
 
 button.red {
-    background-color: rgba(116, 18, 18, 0.6);
+  background-color: rgba(116, 18, 18, 0.6);
 }
 
-button.red:hover, button.red:focus {
-    background-color: rgba(89, 7, 7, 0.6);
+button.red:hover,
+button.red:focus {
+  background-color: rgba(89, 7, 7, 0.6);
 }
 
+.card {
+  width: 80%;
+  margin: 40px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: first baseline;
+}
+
+#main-container {
+  margin-top: 200px;
+  margin-bottom: 200px;
+  width: 80%;
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
 
 @media screen and (max-width: 620px) {
-    .multi-bg, button.multi-bg:hover {
-        background: none;
-        animation: colour-chage 10s ease-in-out infinite
-    }
+  .multi-bg,
+  button.multi-bg:hover {
+    background: none;
+    animation: colour-chage 10s ease-in-out infinite;
+  }
 
-    button.multi-bg:focus {
-        background-color: rgba(95, 156, 15, 0.47);
-    }
+  button.multi-bg:focus {
+    background-color: rgba(95, 156, 15, 0.47);
+  }
 
-    @keyframes colour-chage {
-        0% {background-color: rgb(52, 9, 160, 0.47);} 
-        50% {background-color: rgb(194, 53, 53, 0.47);}
-        100% {background-color: rgb(52, 9, 160, 0.47);}
+  @keyframes colour-chage {
+    0% {
+      background-color: rgb(52, 9, 160, 0.47);
     }
-
+    50% {
+      background-color: rgb(194, 53, 53, 0.47);
+    }
+    100% {
+      background-color: rgb(52, 9, 160, 0.47);
+    }
+  }
 }

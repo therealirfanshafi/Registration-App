@@ -57,7 +57,6 @@ const router = createRouter({
       name: 'verification',
       component: VerifyEmail
     }
-
   ]
 })
 

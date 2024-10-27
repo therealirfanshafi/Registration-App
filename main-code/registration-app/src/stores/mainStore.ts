@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import  pb from '@/pocketbase/index'
+import pb from '@/pocketbase/index'
 
 export const useMainStore = defineStore('main', {
   state: () => {

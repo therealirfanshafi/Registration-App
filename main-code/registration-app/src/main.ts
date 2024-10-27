@@ -5,7 +5,6 @@ import App from './App.vue'
 import router from './router'
 import './assets/default.css'
 
- 
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
@@ -15,7 +14,6 @@ import { faGithub } from '@fortawesome/free-brands-svg-icons/faGithub'
 import { faCheck } from '@fortawesome/free-solid-svg-icons'
 import { faXmark } from '@fortawesome/free-solid-svg-icons'
 library.add(faInstagram, faFacebook, faGithub, faCheck, faXmark)
-
 
 import CustomFooter from './components/CustomFooter.vue'
 
