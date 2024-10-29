@@ -25,7 +25,7 @@ routerAdd('POST', '/pay', (c) => {
             token: tokenRes.json.token,
             store_id: tokenRes.json.store_id,
             return_url: `http://127.0.0.1:8090/sucessful-pay`,
-            cancel_url: 'http://127.0.0.1:5173',
+            cancel_url: 'http://127.0.0.1:8090',
             amount: 2000,
             order_id: userID,
             currency: 'BDT',
@@ -88,7 +88,7 @@ routerAdd('GET', '/sucessful-pay', (c) => {
     paymentInfo.set('Token', '')
     $app.dao().saveRecord(paymentInfo)
 
-    return c.redirect(302, 'http://127.0.0.1:5173')
+    return c.redirect(302, 'http://127.0.0.1:8090')
 })
 
 
