@@ -3,7 +3,7 @@
     <button
       class="default-button"
       @click="
-        mainStore.logout()
+        mainStore.logout();
         $router.push({ name: 'title' })
       "
       :class="{ blue: category == 'Junior', red: category == 'Senior' }"

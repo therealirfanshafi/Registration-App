@@ -238,25 +238,26 @@ export default defineComponent({
       this.reqlAlreadySent = false
 
       let member: RecordModel[] | string = await pb.collection('Participant').getFullList({
-        fields: 'id, Category',
-        filter: `email = "${this.groups[index].memberReq}"`
+        fields: 'id, Category, expand',
+        filter: `email = "${this.groups[index].memberReq}"`,
+        expand: 'Category'
       })
       if (member.length == 0) {
         this.invalidEmail = true
       } else {
-        const memCategory = member[0].Category
+        const memCategory = member[0].expand.Category.Category
         member = member[0].id
         const groupIntermediate = (
           await pb.collection('Group').getFullList({
             filter: `Name = "${this.groups[index].name}"`,
-            expand: 'Admin'
+            expand: 'Admin, Admin.Category'
           })
         )[0]
         const grp = groupIntermediate.id
         const members: string[] = groupIntermediate.Members
         this.memberAlreadyinGrp = members.includes(member)
         if (!this.memberAlreadyinGrp) {
-          if (memCategory != groupIntermediate.expand.Admin.Category) {
+          if (memCategory != groupIntermediate.expand.Admin.expand.Category.Category) {
             this.wrongCategory = true
           } else {
             try {
@@ -328,11 +329,10 @@ export default defineComponent({
               })
             ).id
           } catch (error) {
-            console.error(error)
-            this.segments[i].group = this.oldSegments[i].group
             alert(
               `A member in ${this.segments[i].group} is already registered for ${this.segments[i].name}`
             )
+            this.segments[i].group = this.oldSegments[i].group
           }
         } else if (this.oldSegments[i].group != this.segments[i].group) {
           await pb.collection('Group_Segment_Group').delete(this.segments[i].recordID)

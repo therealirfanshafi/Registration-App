@@ -5,7 +5,7 @@
       :class="{ blue: category == 'Junior', red: category == 'Senior' }"
       id="logout"
       @click="
-        mainStore.logout()
+        mainStore.logout();
         $router.push({ name: 'title' })
       "
     >
