@@ -10,8 +10,8 @@ import { useMainStore } from './stores/mainStore'
   <main
     :class="{
       'logged-out': !mainStore.loggedIn,
-      'logged-in-jr': category == 'Junior',
-      'logged-in-sr': category == 'Senior'
+      'logged-in-jr': mainStore.loggedIn && category == 'Junior',
+      'logged-in-sr': mainStore.loggedIn && category == 'Senior'
     }"
     v-if="dataReady"
   >

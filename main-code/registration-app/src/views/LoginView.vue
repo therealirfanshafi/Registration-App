@@ -16,7 +16,7 @@ export default defineComponent({
   mounted() {
     if (!this.mainStore.verified && this.mainStore.loggedIn) {
       this.$router.push({ name: 'verification' })
-    } else if (this.mainStore.verified) {
+    } else if (this.mainStore.loggedIn) {
       this.$router.replace({ name: 'home' })
     }
   },

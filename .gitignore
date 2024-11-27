@@ -33,3 +33,4 @@ coverage
 *.tsbuildinfo
 
 pb_data
+env.json
