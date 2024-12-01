@@ -1,6 +1,6 @@
 <template>
   <main>
-    <div :class="{ blue: category == 'Junior', red: category == 'Senior' }">
+    <div class="nutty-colour">
       <h1>
         Complete Payment by clicking the button below. The registration is fee is 2000 tk. Once paid
         your spot in the fest will be confirmed.
@@ -14,12 +14,7 @@
         a confirmation mail once we verify your payment.
       </h1>
 
-      <button
-        :class="{ blue: category == 'Junior', red: category == 'Senior' }"
-        @click="completePayment()"
-      >
-        Complete payment
-      </button>
+      <button @click="completePayment()">Complete payment</button>
     </div>
   </main>
 </template>
@@ -37,13 +32,6 @@ export default defineComponent({
       this.$router.replace({ name: 'login' })
     } else if (!this.mainStore.verified) {
       this.$router.replace({ name: 'verification' })
-    }
-    this.category = (await pb.collection('Category').getOne(pb.authStore.model.Category)).Category
-  },
-
-  data() {
-    return {
-      category: ''
     }
   },
 

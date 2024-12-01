@@ -1,22 +1,10 @@
 <template>
   <main>
     <div id="button-container" v-if="JSON.stringify(oldSegments) !== JSON.stringify(segments)">
-      <button
-        class="default-button"
-        :class="{ blue: category == 'Junior', red: category == 'Senior' }"
-        @click="saveChanges()"
-      >
-        Save Changes
-      </button>
-      <button
-        class="default-button"
-        :class="{ blue: category == 'Junior', red: category == 'Senior' }"
-        @click="cancel()"
-      >
-        Cancel
-      </button>
+      <button class="default-button" @click="saveChanges()">Save Changes</button>
+      <button class="default-button" @click="cancel()">Cancel</button>
     </div>
-    <div id="main-container" :class="{ blue: category == 'Junior', red: category == 'Senior' }">
+    <div id="main-container" class="nutty-colour">
       <h1>Select the segments you want to participate in</h1>
       <div v-for="(item, index) of segments" :key="index" class="segment-checkboxes">
         <label :for="item.name">{{ item.name }}</label>
@@ -43,8 +31,6 @@ export default defineComponent({
     } else if (!this.mainStore.verified) {
       this.$router.replace({ name: 'verification' })
     }
-
-    this.category = (await pb.collection('Category').getOne(pb.authStore.model.Category)).Category
 
     const segmentsIntermediate1 = await pb.collection('Solo_Segment_Participant').getFullList({
       fields: 'id, Segment',
@@ -80,8 +66,7 @@ export default defineComponent({
   data() {
     return {
       oldSegments: [{ name: '', participate: false, segmentId: '', recordId: '' }],
-      segments: [{ name: '', participate: false, segmentId: '', recordId: '' }],
-      category: ''
+      segments: [{ name: '', participate: false, segmentId: '', recordId: '' }]
     }
   },
   methods: {

@@ -4,22 +4,10 @@
       id="button-container"
       v-if="JSON.stringify(oldSubmissions) !== JSON.stringify(submissions)"
     >
-      <button
-        class="default-button"
-        :class="{ blue: category == 'Junior', red: category == 'Senior' }"
-        @click="saveChanges()"
-      >
-        Save Changes
-      </button>
-      <button
-        class="default-button"
-        :class="{ blue: category == 'Junior', red: category == 'Senior' }"
-        @click="cancel()"
-      >
-        Cancel
-      </button>
+      <button class="default-button" @click="saveChanges()">Save Changes</button>
+      <button class="default-button" @click="cancel()">Cancel</button>
     </div>
-    <div id="main-container" :class="{ blue: category == 'Junior', red: category == 'Senior' }">
+    <div id="main-container" class="nutty-colour">
       <h1>Upload / Change your project for the following segments</h1>
       <div
         v-for="(item, index) of submissions.filter((val) => val.isAdmin)"
@@ -61,7 +49,6 @@ export default defineComponent({
       this.$router.replace({ name: 'verification' })
     }
 
-    this.category = (await pb.collection('Category').getOne(pb.authStore.model.Category)).Category
     const subIntermediate = await pb.collection('Group_Segment_Group').getFullList({
       filter: `Group.Members.id ?= "${pb.authStore.model.id}" && Segment.Requires_Submission = true`,
       expand: 'Segment, Group'
@@ -92,8 +79,7 @@ export default defineComponent({
   data() {
     return {
       oldSubmissions: [{ name: '', isAdmin: false, link: '', recordID: '' }],
-      submissions: [{ name: '', isAdmin: false, link: '', recordID: '' }],
-      category: ''
+      submissions: [{ name: '', isAdmin: false, link: '', recordID: '' }]
     }
   },
   methods: {

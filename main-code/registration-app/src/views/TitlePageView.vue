@@ -8,13 +8,13 @@
     <div class="column-centering" id="sign-up-container">
       <p>What are you waiting for</p>
       <RouterLink :to="{ name: 'registration' }">
-        <button class="multi-bg" id="sign-up-button">Sign Up Today</button>
+        <button id="sign-up-button">Sign Up Today</button>
       </RouterLink>
     </div>
     <div class="column-centering" id="login-container">
       <p>Already signed up?</p>
       <RouterLink :to="{ name: 'login' }">
-        <button class="multi-bg" id="login-button">Login Instead</button>
+        <button id="login-button">Login Instead</button>
       </RouterLink>
     </div>
   </main>
@@ -60,6 +60,11 @@ export default defineComponent({
 button {
   border: none;
   padding: 10px;
+  background-color: rgba(166, 81, 7, 0.5);
+}
+
+button:hover {
+  background-color: rgba(128, 61, 3, 0.5);
 }
 
 h1,
@@ -73,7 +78,7 @@ h3 {
 h1 {
   font-family: 'Lexend Peta', sans-serif;
   font-size: 3rem;
-  color: #35984e;
+  color: #f57402;
   margin-top: 150px;
   margin-bottom: 10px;
 }
@@ -86,7 +91,7 @@ h2 {
 
 h3 {
   font-size: 1rem;
-  color: #50ad33;
+  color: #f38c33;
   margin-bottom: 30px;
 }
 

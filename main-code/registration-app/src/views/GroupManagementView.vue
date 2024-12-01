@@ -1,43 +1,22 @@
 <template>
   <main>
     <div id="main-container-override">
-      <div
-        id="new-grp-container"
-        class="card"
-        :class="{ blue: category == 'Junior', red: category == 'Senior' }"
-      >
+      <div id="new-grp-container" class="card">
         <h1>Create new group</h1>
         <label for="new-grp-input">Group Name</label>
         <input type="text" id="new-grp-input" v-model="newGroup" />
         <p v-if="!validateGroupName">Group name already in use</p>
-        <button
-          @click="createNewGroup()"
-          class="default-button"
-          :class="{ blue: category == 'Junior', red: category == 'Senior' }"
-        >
-          Create Group
-        </button>
+        <button @click="createNewGroup()" class="default-button">Create Group</button>
       </div>
       <div id="manage-group-container" v-if="groups.length">
         <h1 style="color: rgb(189, 129, 18)">Manage Group Members</h1>
         <div id="manage-group-cards">
-          <div
-            v-for="(item, index1) of groups"
-            :key="index1"
-            class="card"
-            :class="{ blue: category == 'Junior', red: category == 'Senior' }"
-          >
+          <div v-for="(item, index1) of groups" :key="index1" class="card">
             <h2>{{ item.name }}</h2>
             <div class="group-member-add" v-if="item.members.length < 4 && item.isAdmin">
               <label :for="`${item.name}-input`" style="font-size: 1rem">New member email</label>
               <input type="email" :id="`${item.name}-input`" v-model="item.memberReq" />
-              <button
-                @click="addMember(index1)"
-                class="default-button"
-                :class="{ blue: category == 'Junior', red: category == 'Senior' }"
-              >
-                Add member
-              </button>
+              <button @click="addMember(index1)" class="default-button">Add member</button>
               <p v-if="invalidEmail">Email does not exist</p>
               <p v-if="memberAlreadyinGrp">Member already in group</p>
               <p v-if="wrongCategory">This member is in a different category from you</p>
@@ -57,12 +36,7 @@
                 /></a>
               </li>
             </ul>
-            <button
-              class="default-button"
-              :class="{ blue: category == 'Junior', red: category == 'Senior' }"
-              @click="deleteGroup(index1)"
-              v-if="item.isAdmin"
-            >
+            <button class="default-button" @click="deleteGroup(index1)" v-if="item.isAdmin">
               Delete Group
             </button>
             <p v-else>You are not the admin for this group</p>
@@ -71,7 +45,7 @@
       </div>
       <div id="manage-segments-container">
         <h1 style="color: rgb(189, 129, 18)">Manage Group segments</h1>
-        <div class="card" :class="{ blue: category == 'Junior', red: category == 'Senior' }">
+        <div class="card">
           <div v-for="(item, index1) of segments" :key="index1" class="group-segment-relators">
             <label :for="item.name">{{ item.name }}</label>
             <select :id="item.name" v-model="item.group" v-if="item.isAdmin || !item.group">
@@ -93,20 +67,8 @@
             id="button-container"
             v-if="JSON.stringify(oldSegments) !== JSON.stringify(segments)"
           >
-            <button
-              class="default-button"
-              :class="{ blue: category == 'Junior', red: category == 'Senior' }"
-              @click="saveChanges()"
-            >
-              Save Changes
-            </button>
-            <button
-              class="default-button"
-              :class="{ blue: category == 'Junior', red: category == 'Senior' }"
-              @click="cancel()"
-            >
-              Cancel
-            </button>
+            <button class="default-button" @click="saveChanges()">Save Changes</button>
+            <button class="default-button" @click="cancel()">Cancel</button>
           </div>
         </div>
       </div>
@@ -128,7 +90,7 @@ export default defineComponent({
     } else if (!this.mainStore.verified) {
       this.$router.replace({ name: 'verification' })
     }
-    this.category = (await pb.collection('Category').getOne(pb.authStore.model.Category)).Category
+
     const groupsIntermediate = await pb.collection('Group').getFullList({
       expand: 'Admin, Members',
       filter: `Members.id ?= "${pb.authStore.model.id}"`
@@ -206,7 +168,6 @@ export default defineComponent({
         { name: '', group: '', isAdmin: false, segmentID: '', groupID: '', recordID: '' }
       ],
       newGroup: '',
-      category: '',
       invalidEmail: false,
       memberAlreadyinGrp: false,
       wrongCategory: false,

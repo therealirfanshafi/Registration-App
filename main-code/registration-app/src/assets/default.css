@@ -38,55 +38,17 @@ li {
 button:hover,
 button:focus {
   cursor: pointer;
+  background-color: rgba(36, 17, 0, 0.6);
 }
 
-.multi-bg {
-  background: linear-gradient(
-    to right,
-    rgb(194, 53, 53, 0.47) 0%,
-    rgb(194, 53, 53, 0.47) 50%,
-    rgb(52, 9, 160, 0.47) 50%,
-    rgb(52, 9, 160, 0.47) 100%
-  );
-  font-family: 'Aldrich', sans-serif;
+button {
+  background-color: rgba(64, 30, 0, 0.6);
   color: white;
 }
 
-button.multi-bg:hover {
-  background: linear-gradient(
-    to right,
-    rgba(165, 34, 34, 0.47) 0%,
-    rgb(165, 34, 34, 0.47) 50%,
-    rgb(38, 3, 124, 0.47) 50%,
-    rgb(38, 3, 124, 0.47) 100%
-  );
-  cursor: pointer;
-}
-
-.blue {
-  background-color: rgb(81, 42, 198, 0.4);
-}
-
-button.blue {
-  background-color: rgb(51, 18, 116, 0.6);
-}
-
-button.blue:hover,
-button.blue:focus {
-  background-color: rgba(35, 7, 89, 0.6);
-}
-
-.red {
-  background-color: rgba(198, 42, 42, 0.4);
-}
-
-button.red {
-  background-color: rgba(116, 18, 18, 0.6);
-}
-
-button.red:hover,
-button.red:focus {
-  background-color: rgba(89, 7, 7, 0.6);
+.nutty-colour,
+.card {
+  background-color: rgba(245, 116, 2, 0.5);
 }
 
 .card {
@@ -106,28 +68,4 @@ button.red:focus {
   display: flex;
   flex-direction: column;
   align-items: center;
-}
-
-@media screen and (max-width: 620px) {
-  .multi-bg,
-  button.multi-bg:hover {
-    background: none;
-    animation: colour-chage 10s ease-in-out infinite;
-  }
-
-  button.multi-bg:focus {
-    background-color: rgba(95, 156, 15, 0.47);
-  }
-
-  @keyframes colour-chage {
-    0% {
-      background-color: rgb(52, 9, 160, 0.47);
-    }
-    50% {
-      background-color: rgb(194, 53, 53, 0.47);
-    }
-    100% {
-      background-color: rgb(52, 9, 160, 0.47);
-    }
-  }
 }

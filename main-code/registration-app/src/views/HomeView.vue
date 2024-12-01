@@ -2,7 +2,6 @@
   <main>
     <button
       class="default-button"
-      :class="{ blue: category == 'Junior', red: category == 'Senior' }"
       id="logout"
       @click="
         mainStore.logout();
@@ -11,49 +10,26 @@
     >
       Logout
     </button>
-    <div
-      class="card"
-      :class="{ blue: category == 'Junior', red: category == 'Senior' }"
-      id="payment-card"
-    >
+    <div class="card" id="payment-card">
       <h1>Payment</h1>
       <h2 style="text-align: center" v-if="!paid">
         Complete the payment to earn your spot in the fest
       </h2>
       <p v-if="!paid">{{ numSeatsLeft }} seats left</p>
       <h2 v-else>You have completed the payment. Enjoy the fest</h2>
-      <button
-        class="default-button"
-        :class="{ blue: category == 'Junior', red: category == 'Senior' }"
-        @click="$router.push({ name: 'payment' })"
-        v-if="!paid"
-      >
+      <button class="default-button" @click="$router.push({ name: 'payment' })" v-if="!paid">
         Complete Payment
       </button>
     </div>
-    <div
-      class="card"
-      :class="{ blue: category == 'Junior', red: category == 'Senior' }"
-      id="segment-card"
-    >
+    <div class="card" id="segment-card">
       <h1>Your Segments</h1>
       <ul v-if="segments.length">
         <li v-for="(item, index) of segments" :key="index">{{ item }}</li>
       </ul>
       <h2 v-else>You did not register for any segment yet</h2>
-      <button
-        class="default-button"
-        :class="{ blue: category == 'Junior', red: category == 'Senior' }"
-        @click="$router.push({ name: 'segmentManage' })"
-      >
-        Edit
-      </button>
+      <button class="default-button" @click="$router.push({ name: 'segmentManage' })">Edit</button>
     </div>
-    <div
-      class="card"
-      :class="{ blue: category == 'Junior', red: category == 'Senior' }"
-      id="group-card"
-    >
+    <div class="card" id="group-card">
       <h1>Group Requests</h1>
       <ul id="grp-req-list" v-if="groupRequests.length">
         <li v-for="(item, index) of groupRequests" :key="index">
@@ -80,19 +56,11 @@
         <li v-for="(item, index) of yourGroups" :key="index">{{ item }}</li>
       </ul>
       <h2 v-else>You are currently not in any group</h2>
-      <button
-        class="default-button"
-        :class="{ blue: category == 'Junior', red: category == 'Senior' }"
-        @click="$router.push({ name: 'groupManage' })"
-      >
+      <button class="default-button" @click="$router.push({ name: 'groupManage' })">
         Manage Groups
       </button>
     </div>
-    <div
-      class="card"
-      :class="{ blue: category == 'Junior', red: category == 'Senior' }"
-      id="submission-card"
-    >
+    <div class="card" id="submission-card">
       <h1>Submissions</h1>
       <ul v-if="projects.length">
         <li v-for="(item, index) of projects" :key="index">
@@ -105,7 +73,6 @@
       </ul>
       <button
         class="default-button"
-        :class="{ blue: category == 'Junior', red: category == 'Senior' }"
         v-if="projects.length"
         @click="$router.push({ name: 'projectSubmission' })"
       >
@@ -130,8 +97,6 @@ export default defineComponent({
     } else if (!this.mainStore.verified) {
       this.$router.replace({ name: 'verification' })
     }
-
-    this.category = (await pb.collection('Category').getOne(pb.authStore.model.Category)).Category
 
     const segmentIntermediate1 = await pb.collection('Solo_Segment_Participant').getFullList({
       fields: 'Segment, expand',
@@ -208,8 +173,7 @@ export default defineComponent({
       yourGroups: [''],
       projects: [{ segment: 'Something', submitted: false }],
       paid: false,
-      numSeatsLeft: 0,
-      category: ''
+      numSeatsLeft: 0
     }
   },
 

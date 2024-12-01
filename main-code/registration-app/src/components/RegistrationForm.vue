@@ -1,7 +1,7 @@
 <template>
   <main>
     <h1 id="title">Sign Up</h1>
-    <form class="multi-bg" @submit.prevent="createNewUser()">
+    <form @submit.prevent="createNewUser()">
       <h3 style="text-align: center; color: rgb(250, 179, 0)">
         Warning: You cannnot change any information once you create the account.
       </h3>
@@ -257,6 +257,7 @@ form *,
 
 form {
   padding: 40px;
+  background-color: rgba(245, 116, 2, 0.5);
 }
 
 input,
