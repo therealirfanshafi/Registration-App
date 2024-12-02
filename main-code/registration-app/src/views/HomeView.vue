@@ -12,13 +12,14 @@
     </button>
     <div class="card" id="payment-card">
       <h1>Payment</h1>
-      <h2 style="text-align: center" v-if="!paid">
-        Complete the payment to earn your spot in the fest
+      <h2 style="text-align: center" v-if="!paid && !filledConfirmation">
+        Confirm your payment to earn your spot in the fest.
       </h2>
-      <p v-if="!paid">{{ numSeatsLeft }} seats left</p>
-      <h2 v-else>You have completed the payment. Enjoy the fest</h2>
-      <button class="default-button" @click="$router.push({ name: 'payment' })" v-if="!paid">
-        Complete Payment
+      <p v-if="!paid && !filledConfirmation">{{ numSeatsLeft }} seats left</p>
+      <h2 v-else-if="filledConfirmation && !paid">We will review your payment. You will receive a confirmation mail once verified.</h2>
+      <h2 v-else>We have verified your payment. Enjoy the fest.</h2>
+      <button class="default-button" @click="$router.push({ name: 'payment' })" v-if="!paid && !filledConfirmation">
+        Confirm Payment
       </button>
     </div>
     <div class="card" id="segment-card">
@@ -162,6 +163,8 @@ export default defineComponent({
     })
     this.numSeatsLeft = 300 - numSeatsLeftIntermediate.items.length
 
+
+    this.filledConfirmation = (await pb.collection('Payment_Info').getFullList({filter: `Participant = "${pb.authStore.model.id}"` })).length !== 0
     this.paid = (await pb.collection('Participant').getOne(pb.authStore.model.id)).Paid
   },
 
@@ -172,6 +175,7 @@ export default defineComponent({
       groupRequests: [''],
       yourGroups: [''],
       projects: [{ segment: 'Something', submitted: false }],
+      filledConfirmation: false,
       paid: false,
       numSeatsLeft: 0
     }
@@ -186,9 +190,7 @@ export default defineComponent({
         })
       )[0].id
 
-      console.log(grp)
-
-      console.log()
+      
 
       const thisGrpSegments = (
         await pb.collection('Group_Segment_Group').getFullList({
@@ -198,11 +200,9 @@ export default defineComponent({
         })
       ).map((val) => val.expand.Segment.Name)
 
-      console.log(thisGrpSegments)
+  
 
       let isValid = true
-      console.log(thisGrpSegments)
-      console.log(this.groupSegements)
       for (let temp1 of thisGrpSegments) {
         for (let temp2 of this.groupSegements) {
           if (temp1 == temp2) {

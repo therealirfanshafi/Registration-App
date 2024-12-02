@@ -3,7 +3,7 @@ import TitlePageView from '@/views/TitlePageView.vue'
 import RegistrationView from '@/views/RegistrationView.vue'
 import LoginView from '@/views/LoginView.vue'
 import HomeView from '@/views/HomeView.vue'
-import PaymentView from '@/views/PaymentView.vue'
+import PaymentConfirmationView from '@/views/PaymentConfirmationView.vue'
 import SegmentManagementView from '@/views/SegmentManagementView.vue'
 import ProjectSubmissionView from '@/views/ProjectSubmissionView.vue'
 import GroupManagementView from '@/views/GroupManagementView.vue'
@@ -35,7 +35,7 @@ const router = createRouter({
     {
       path: '/pay',
       name: 'payment',
-      component: PaymentView
+      component: PaymentConfirmationView
     },
     {
       path: '/manage-segments',
