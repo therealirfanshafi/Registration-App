@@ -5,7 +5,7 @@ export const useMainStore = defineStore('main', {
   state: () => {
     return {
       loggedIn: pb.authStore.isValid,
-      verified: pb.authStore.model ? pb.authStore.model.verified : false,
+      verified: pb.authStore.record ? pb.authStore.record.verified : false,
       refreshFlag: false
     }
   },

@@ -93,7 +93,7 @@ export default defineComponent({
 
     const groupsIntermediate = await pb.collection('Group').getFullList({
       expand: 'Admin, Members',
-      filter: `Members.id ?= "${pb.authStore.model.id}"`
+      filter: `Members.id ?= "${pb.authStore.record.id}"`
     })
     this.groups = groupsIntermediate.map((val) =>
       Object.create({
@@ -101,7 +101,7 @@ export default defineComponent({
         members: val.expand.Members.map(
           (val2: RecordModel) => val2.First_Name + ' ' + val2.Last_Name
         ),
-        isAdmin: val.Admin == pb.authStore.model.id,
+        isAdmin: val.Admin == pb.authStore.record.id,
         adminName: val.expand.Admin.First_Name + ' ' + val.expand.Admin.Last_Name,
         memberReq: ''
       })
@@ -113,7 +113,7 @@ export default defineComponent({
 
     const grpSegmentIntermediate2 = await pb.collection('Group_Segment_Group').getFullList({
       fields: 'id, expand',
-      filter: `Group.Members.id ?= "${pb.authStore.model.id}"`,
+      filter: `Group.Members.id ?= "${pb.authStore.record.id}"`,
       expand: 'Segment, Group'
     })
     const grpsButNotThis = this.groups
@@ -179,14 +179,14 @@ export default defineComponent({
       if (this.validateGroupName) {
         await pb.collection('Group').create({
           Name: this.newGroup,
-          Admin: pb.authStore.model.id,
-          Members: [pb.authStore.model.id]
+          Admin: pb.authStore.record.id,
+          Members: [pb.authStore.record.id]
         })
         this.groups.push({
           name: this.newGroup,
-          members: [pb.authStore.model.First_Name + ' ' + pb.authStore.model.Last_Name],
+          members: [pb.authStore.record.First_Name + ' ' + pb.authStore.record.Last_Name],
           isAdmin: true,
-          adminName: pb.authStore.model.First_Name + ' ' + pb.authStore.model.Last_Name,
+          adminName: pb.authStore.record.First_Name + ' ' + pb.authStore.record.Last_Name,
           memberReq: ''
         })
         this.newGroup = ''

@@ -34,7 +34,7 @@ export default defineComponent({
 
     const segmentsIntermediate1 = await pb.collection('Solo_Segment_Participant').getFullList({
       fields: 'id, Segment',
-      filter: `Participant = "${pb.authStore.model.id}"`
+      filter: `Participant = "${pb.authStore.record.id}"`
     })
     const SegmentIDs = segmentsIntermediate1.map((val) => val.Segment)
     const segmentsIntermediate2 = await pb.collection('Solo_Segment').getFullList()
@@ -78,7 +78,7 @@ export default defineComponent({
         ) {
           await pb.collection('Solo_Segment_Participant').create({
             Segment: this.oldSegments[i].segmentId,
-            Participant: pb.authStore.model.id
+            Participant: pb.authStore.record.id
           })
         } else if (this.oldSegments[i].participate != this.segments[i].participate) {
           await pb.collection('Solo_Segment_Participant').delete(this.segments[i].recordId)

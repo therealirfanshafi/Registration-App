@@ -1,8 +1,8 @@
 /* eslint-disable no-undef */
 /// <reference path="../pb_data/types.d.ts" />
 
-onRecordBeforeUpdateRequest((e) => {
-    const oldPaid = $app.dao().findRecordById('Participant', e.record.id).get('Paid')
+onRecordUpdateRequest((e) => {
+    const oldPaid = $app.findRecordById('Participant', e.record.id).get('Paid')
     if (!oldPaid && e.record.get('Paid')) {
         const paymentConfirmMail = new MailerMessage({
             from: {
@@ -17,4 +17,7 @@ onRecordBeforeUpdateRequest((e) => {
 
         $app.newMailClient().send(paymentConfirmMail)
     }
+
+    e.next()
+    
 }, 'Participant')

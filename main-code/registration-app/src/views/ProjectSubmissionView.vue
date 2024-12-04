@@ -50,14 +50,14 @@ export default defineComponent({
     }
 
     const subIntermediate = await pb.collection('Group_Segment_Group').getFullList({
-      filter: `Group.Members.id ?= "${pb.authStore.model.id}" && Segment.Requires_Submission = true`,
+      filter: `Group.Members.id ?= "${pb.authStore.record.id}" && Segment.Requires_Submission = true`,
       expand: 'Segment, Group'
     })
 
     this.oldSubmissions = subIntermediate.map((val) =>
       Object.create({
         name: val.expand.Segment.Name,
-        isAdmin: val.expand.Group.Admin == pb.authStore.model.id,
+        isAdmin: val.expand.Group.Admin == pb.authStore.record.id,
         link: val.Submission,
         recordID: val.id
       })
@@ -66,7 +66,7 @@ export default defineComponent({
     this.submissions = subIntermediate.map((val) =>
       Object.create({
         name: val.expand.Segment.Name,
-        isAdmin: val.expand.Group.Admin == pb.authStore.model.id,
+        isAdmin: val.expand.Group.Admin == pb.authStore.record.id,
         link: val.Submission,
         recordID: val.id
       })

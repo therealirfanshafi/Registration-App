@@ -20,8 +20,10 @@ import pb from '@/pocketbase'
 
 export default defineComponent({
   async mounted() {
-    if (pb.authStore.model) {
-      this.category = (await pb.collection('Category').getOne(pb.authStore.model.Category)).Category
+    if (pb.authStore.record) {
+      this.category = (
+        await pb.collection('Category').getOne(pb.authStore.record.Category)
+      ).Category
     }
     this.dataReady = true
   },

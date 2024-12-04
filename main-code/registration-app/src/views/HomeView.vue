@@ -16,9 +16,15 @@
         Confirm your payment to earn your spot in the fest.
       </h2>
       <p v-if="!paid && !filledConfirmation">{{ numSeatsLeft }} seats left</p>
-      <h2 v-else-if="filledConfirmation && !paid">We will review your payment. You will receive a confirmation mail once verified.</h2>
+      <h2 v-else-if="filledConfirmation && !paid">
+        We will review your payment. You will receive a confirmation mail once verified.
+      </h2>
       <h2 v-else>We have verified your payment. Enjoy the fest.</h2>
-      <button class="default-button" @click="$router.push({ name: 'payment' })" v-if="!paid && !filledConfirmation">
+      <button
+        class="default-button"
+        @click="$router.push({ name: 'payment' })"
+        v-if="!paid && !filledConfirmation"
+      >
         Confirm Payment
       </button>
     </div>
@@ -101,13 +107,13 @@ export default defineComponent({
 
     const segmentIntermediate1 = await pb.collection('Solo_Segment_Participant').getFullList({
       fields: 'Segment, expand',
-      filter: `Participant = "${pb.authStore.model.id}"`,
+      filter: `Participant = "${pb.authStore.record.id}"`,
       expand: 'Segment'
     })
 
     const groupsIntermediate = await pb.collection('Group').getFullList({
       fields: 'id, Name',
-      filter: `Members.id ?= "${pb.authStore.model.id}"`
+      filter: `Members.id ?= "${pb.authStore.record.id}"`
     })
 
     if (groupsIntermediate.length) {
@@ -118,7 +124,7 @@ export default defineComponent({
 
     const segmentIntermediate2 = await pb.collection('Group_Segment_Group').getFullList({
       fields: 'Segment, expand, Submission',
-      filter: `Group.Members.id ?= "${pb.authStore.model.id}"`,
+      filter: `Group.Members.id ?= "${pb.authStore.record.id}"`,
       expand: 'Segment'
     })
 
@@ -141,7 +147,7 @@ export default defineComponent({
 
     const grpReqIntermediate = await pb.collection('Group_Requests').getFullList({
       fields: 'expand',
-      filter: `Participant = "${pb.authStore.model.id}"`,
+      filter: `Participant = "${pb.authStore.record.id}"`,
       expand: 'Group'
     })
 
@@ -163,9 +169,13 @@ export default defineComponent({
     })
     this.numSeatsLeft = 300 - numSeatsLeftIntermediate.items.length
 
-
-    this.filledConfirmation = (await pb.collection('Payment_Info').getFullList({filter: `Participant = "${pb.authStore.model.id}"` })).length !== 0
-    this.paid = (await pb.collection('Participant').getOne(pb.authStore.model.id)).Paid
+    this.filledConfirmation =
+      (
+        await pb
+          .collection('Payment_Info')
+          .getFullList({ filter: `Participant = "${pb.authStore.record.id}"` })
+      ).length !== 0
+    this.paid = (await pb.collection('Participant').getOne(pb.authStore.record.id)).Paid
   },
 
   data() {
@@ -190,8 +200,6 @@ export default defineComponent({
         })
       )[0].id
 
-      
-
       const thisGrpSegments = (
         await pb.collection('Group_Segment_Group').getFullList({
           fields: 'Segment.Name, expand',
@@ -199,8 +207,6 @@ export default defineComponent({
           expand: 'Segment'
         })
       ).map((val) => val.expand.Segment.Name)
-
-  
 
       let isValid = true
       for (let temp1 of thisGrpSegments) {
@@ -215,13 +221,13 @@ export default defineComponent({
       }
       if (isValid) {
         await pb.collection('Group').update(grp, {
-          'Members+': pb.authStore.model.id
+          'Members+': pb.authStore.record.id
         })
 
         const grpReq = (
           await pb.collection('Group_Requests').getFullList({
             fields: 'id',
-            filter: `Group = "${grp}" && Participant = "${pb.authStore.model.id}"`
+            filter: `Group = "${grp}" && Participant = "${pb.authStore.record.id}"`
           })
         )[0].id
 
@@ -235,7 +241,7 @@ export default defineComponent({
       const grpReq = (
         await pb.collection('Group_Requests').getFullList({
           fields: 'id',
-          filter: `Group.Name = "${this.groupRequests[index]}" && Participant = "${pb.authStore.model.id}"`,
+          filter: `Group.Name = "${this.groupRequests[index]}" && Participant = "${pb.authStore.record.id}"`,
           expand: 'Group'
         })
       )[0].id

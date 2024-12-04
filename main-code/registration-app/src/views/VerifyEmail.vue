@@ -38,8 +38,8 @@ export default defineComponent({
       location.reload()
     },
     async resend() {
-      if (pb.authStore.model) {
-        await pb.collection('Participant').requestVerification(pb.authStore.model.email)
+      if (pb.authStore.record) {
+        await pb.collection('Participant').requestVerification(pb.authStore.record.email)
       }
     }
   },
