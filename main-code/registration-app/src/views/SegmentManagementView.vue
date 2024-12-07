@@ -1,10 +1,10 @@
 <template>
-  <main>
+  <main v-if="dataReady">
     <div id="button-container" v-if="JSON.stringify(oldSegments) !== JSON.stringify(segments)">
       <button class="default-button" @click="saveChanges()">Save Changes</button>
       <button class="default-button" @click="cancel()">Cancel</button>
     </div>
-    <div id="main-container" class="nutty-colour">
+    <div id="main-container" class="window-colour">
       <h1>Select the segments you want to participate in</h1>
       <div v-for="(item, index) of segments" :key="index" class="segment-checkboxes">
         <label :for="item.name">{{ item.name }}</label>
@@ -15,6 +15,8 @@
       </h2>
     </div>
   </main>
+  <LoadingSpinner v-else></LoadingSpinner>
+
 </template>
 
 <script lang="ts">
@@ -58,6 +60,7 @@ export default defineComponent({
           : ''
       })
     )
+    this.dataReady = true
   },
   computed: {
     ...mapStores(useMainStore)
@@ -66,7 +69,8 @@ export default defineComponent({
   data() {
     return {
       oldSegments: [{ name: '', participate: false, segmentId: '', recordId: '' }],
-      segments: [{ name: '', participate: false, segmentId: '', recordId: '' }]
+      segments: [{ name: '', participate: false, segmentId: '', recordId: '' }],
+      dataReady: false
     }
   },
   methods: {

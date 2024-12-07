@@ -1,7 +1,7 @@
 <template>
   <main>
     <h1 id="title">Login</h1>
-    <form @submit.prevent="authenticateUser()">
+    <form @submit.prevent="authenticateUser()" class="window-colour">
       <div class="logical-input-group">
         <label for="email">Email</label>
         <input
@@ -88,7 +88,6 @@ form * {
 form {
   padding: 40px;
   width: 80%;
-  background-color: rgba(245, 116, 2, 0.5);
 }
 
 input {

@@ -1,5 +1,5 @@
 <template>
-  <main>
+  <main v-if="dataReady">
     <button
       class="default-button"
       id="logout"
@@ -88,6 +88,7 @@
       <h2 v-else>You are not registered for any segment that requires a project submission</h2>
     </div>
   </main>
+  <LoadingSpinner v-else />
 </template>
 
 <script lang="ts">
@@ -96,6 +97,7 @@ import pb from '@/pocketbase'
 import { useMainStore } from '@/stores/mainStore'
 import { mapStores } from 'pinia'
 import { defineComponent } from 'vue'
+
 
 export default defineComponent({
   async mounted() {
@@ -176,6 +178,7 @@ export default defineComponent({
           .getFullList({ filter: `Participant = "${pb.authStore.record.id}"` })
       ).length !== 0
     this.paid = (await pb.collection('Participant').getOne(pb.authStore.record.id)).Paid
+    this.dataReady = true
   },
 
   data() {
@@ -187,7 +190,8 @@ export default defineComponent({
       projects: [{ segment: 'Something', submitted: false }],
       filledConfirmation: false,
       paid: false,
-      numSeatsLeft: 0
+      numSeatsLeft: 0,
+      dataReady: false
     }
   },
 

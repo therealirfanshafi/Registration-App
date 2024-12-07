@@ -1,5 +1,5 @@
 <template>
-  <main>
+  <main v-if="dataReady">
     <div id="main-container-override">
       <div id="new-grp-container" class="card">
         <h1>Create new group</h1>
@@ -74,6 +74,7 @@
       </div>
     </div>
   </main>
+  <LoadingSpinner v-else></LoadingSpinner>
 </template>
 
 <script lang="ts">
@@ -145,6 +146,7 @@ export default defineComponent({
         fields: 'Name'
       })
     ).map((val) => val.Name.toLowerCase())
+    this.dataReady = true
   },
 
   computed: {
@@ -171,7 +173,8 @@ export default defineComponent({
       invalidEmail: false,
       memberAlreadyinGrp: false,
       wrongCategory: false,
-      reqlAlreadySent: false
+      reqlAlreadySent: false,
+      dataReady: false
     }
   },
   methods: {

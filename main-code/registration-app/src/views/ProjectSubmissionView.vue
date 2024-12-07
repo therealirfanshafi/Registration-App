@@ -1,5 +1,5 @@
 <template>
-  <main>
+  <main v-if="dataReady">
     <div
       id="button-container"
       v-if="JSON.stringify(oldSubmissions) !== JSON.stringify(submissions)"
@@ -7,7 +7,7 @@
       <button class="default-button" @click="saveChanges()">Save Changes</button>
       <button class="default-button" @click="cancel()">Cancel</button>
     </div>
-    <div id="main-container" class="nutty-colour">
+    <div id="main-container" class="window-colour">
       <h1>Upload / Change your project for the following segments</h1>
       <div
         v-for="(item, index) of submissions.filter((val) => val.isAdmin)"
@@ -32,6 +32,7 @@
       </div>
     </div>
   </main>
+  <LoadingSpinner v-else></LoadingSpinner>
 </template>
 
 <script lang="ts">
@@ -71,6 +72,7 @@ export default defineComponent({
         recordID: val.id
       })
     )
+    this.dataReady = true
   },
   computed: {
     ...mapStores(useMainStore)
@@ -79,7 +81,8 @@ export default defineComponent({
   data() {
     return {
       oldSubmissions: [{ name: '', isAdmin: false, link: '', recordID: '' }],
-      submissions: [{ name: '', isAdmin: false, link: '', recordID: '' }]
+      submissions: [{ name: '', isAdmin: false, link: '', recordID: '' }],
+      dataReady: false
     }
   },
   methods: {

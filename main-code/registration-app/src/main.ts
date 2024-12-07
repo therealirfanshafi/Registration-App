@@ -16,6 +16,7 @@ import { faXmark } from '@fortawesome/free-solid-svg-icons'
 library.add(faInstagram, faFacebook, faGithub, faCheck, faXmark)
 
 import CustomFooter from './components/CustomFooter.vue'
+import LoadingSpinner from './components/LoadingSpinner.vue'
 
 const app = createApp(App)
 
@@ -25,5 +26,6 @@ app.use(router)
 app.component('font-awesome-icon', FontAwesomeIcon)
 
 app.component('CustomFooter', CustomFooter)
+app.component('LoadingSpinner', LoadingSpinner)
 
 app.mount('#app')

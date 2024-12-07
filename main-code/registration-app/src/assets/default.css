@@ -38,17 +38,17 @@ li {
 button:hover,
 button:focus {
   cursor: pointer;
-  background-color: rgba(36, 17, 0, 0.6);
+  background-color: rgba(36, 17, 0, 0.8);
 }
 
 button {
-  background-color: rgba(64, 30, 0, 0.6);
+  background-color: rgba(44, 21, 0, 0.8);
   color: white;
 }
 
-.nutty-colour,
+.window-colour,
 .card {
-  background-color: rgba(245, 116, 2, 0.5);
+  background-color: rgba(0, 0, 0, 0.5);
 }
 
 .card {

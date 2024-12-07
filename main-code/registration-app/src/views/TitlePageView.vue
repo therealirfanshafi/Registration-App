@@ -1,12 +1,12 @@
 <template>
-  <main class="column-centering">
+  <main class="column-centering" v-if="dataReady">
     <h1>Sunnydale Math x Tech & Robotics Fest III</h1>
     <h3>Presented by: <br />Sunnydale Math x Tech Club & Sunnydale Robotics Club</h3>
     <h2>The fate of the world rests on your shoulders</h2>
     <h2>Can you fix the timeline?</h2>
     <p id="seat-count">{{ numSeatsLeft }} seats left</p>
     <div class="column-centering" id="sign-up-container">
-      <p>What are you waiting for</p>
+      <p>What are you waiting for?</p>
       <RouterLink :to="{ name: 'registration' }">
         <button id="sign-up-button">Sign Up Today</button>
       </RouterLink>
@@ -18,6 +18,7 @@
       </RouterLink>
     </div>
   </main>
+  <LoadingSpinner v-else></LoadingSpinner>
 </template>
 
 <script lang="ts">
@@ -39,11 +40,13 @@ export default defineComponent({
       filter: 'Paid = true'
     })
     this.numSeatsLeft = 300 - numSeatsLeftIntermediate.items.length
+    this.dataReady = true
   },
 
   data() {
     return {
-      numSeatsLeft: 0
+      numSeatsLeft: 0,
+      dataReady: false
     }
   },
 

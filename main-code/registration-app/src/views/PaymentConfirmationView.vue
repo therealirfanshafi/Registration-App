@@ -1,6 +1,6 @@
 <template>
-  <main>
-    <div class="nutty-colour">
+  <main v-if="dataReady">
+    <div class="window-colour">
       <h1>Registration Fee: 2000 tk</h1>
       <h2>Payment Procedures</h2>
       <h3>Physical Payment Procedure</h3>
@@ -23,10 +23,11 @@
         your payment, you will not be considered for the event.
       </h2>
     </div>
-    <div class="nutty-colour">
+    <div class="window-colour">
       <PaymentConfirmationForm></PaymentConfirmationForm>
     </div>
   </main>
+  <LoadingSpinner v-else></LoadingSpinner>
 </template>
 
 <script lang="ts">
@@ -55,6 +56,14 @@ export default defineComponent({
 
     if (filledConfirmation && paid) {
       this.$router.replace({ name: 'home' })
+    }
+    this.dataReady = true
+    
+  },
+  
+  data() {
+    return {
+      dataReady: false
     }
   },
 

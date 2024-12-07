@@ -1,13 +1,14 @@
 <template>
   <main>
     <h1 id="title">Sign Up</h1>
-    <form @submit.prevent="createNewUser()">
+    <form @submit.prevent="createNewUser()" class="window-colour">
       <h3 style="text-align: center; color: rgb(250, 179, 0)">
         Warning: You cannnot change any information once you create the account.
       </h3>
       <div class="logical-input-group">
-        <label for="full-name">Full Name</label>
-        <input type="text" id="full-name" v-model="fullName" autocomplete="off" />
+        <label for="full-name" style="flex-direction: row; align-items: last baseline;">Full Name<span style="font-size: 0.5rem; margin: 5px">(This will be used in certificates)</span></label>
+        <input type="text" id="full-name" v-model="fullName" autocomplete="off" :class="{ error: !validateFullName && fullName !== '' }"/>
+        <p class="error-message" v-if="!validateFullName && fullName !== ''">Invalid Full Name</p>
       </div>
       <div class="same-line">
         <div class="logical-input-group">
@@ -160,6 +161,7 @@ export default defineComponent({
     async createNewUser() {
       this.submitCount++
       if (
+        this.validateFullName &&
         this.validateEmail &&
         this.validateEmailUniqueness &&
         this.validatePhoneNum &&
@@ -206,6 +208,10 @@ export default defineComponent({
   },
 
   computed: {
+    validateFullName() {
+      const regExp = /^[a-zA-Z]+(?:[-'][a-zA-Z]+)*(?: [a-zA-Z]+(?:[-'][a-zA-Z]+)*)+$/
+      return regExp.test(this.fullName)
+    },
     validateEmail() {
       const regExp =
         /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
@@ -257,7 +263,6 @@ form *,
 
 form {
   padding: 40px;
-  background-color: rgba(245, 116, 2, 0.5);
 }
 
 input,
