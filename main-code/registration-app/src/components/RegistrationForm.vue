@@ -96,13 +96,30 @@
         <p>Will you avail bus?</p>
         <div id="bus-avail-container">
           <div class="radio-options">
-            <label for="yes">Yes</label>
-            <input type="radio" id="yes" value="Yes" name="bus" v-model="willAvailBus" />
+            <label for="bus-yes">Yes</label>
+            <input type="radio" id="bus-yes" value="Yes" name="bus" v-model="willAvailBus" />
           </div>
           <div class="radio-options">
-            <label for="no">No</label>
-            <input type="radio" id="no" value="No" name="bus" v-model="willAvailBus" />
+            <label for="bus-no">No</label>
+            <input type="radio" id="bus-no" value="No" name="bus" v-model="willAvailBus" />
           </div>
+        </div>
+      </div>
+      <div v-else-if="school !== ''">
+        <p style="text-align: center;">Do you want to register as a Campus Ambassador?</p>
+        <div id="ca-container">
+          <div class="radio-options">
+            <label for="ca-yes">Yes</label>
+            <input type="radio" id="ca-yes" value="Yes" name="CA" v-model="isCA" />
+          </div>
+          <div class="radio-options">
+            <label for="ca-no">No</label>
+            <input type="radio" id="ca-no" value="No" name="bus" v-model="isCA" />
+          </div>
+        </div>
+        <div v-if="isCA == 'Yes'">
+          <label for="expected-number" style="text-align: center;">How many students do you expect to bring?</label>
+          <input type="number" name="" id="expected-number" v-model="expectedNumber">
         </div>
       </div>
       <p
@@ -150,6 +167,8 @@ export default defineComponent({
       school: '',
       grade: '',
       willAvailBus: 'No',
+      isCA: 'No',
+      expectedNumber: 0,
       submitCount: 0,
       emailsUsed: [''],
       error: false,
@@ -182,7 +201,7 @@ export default defineComponent({
             schoolID = this.schoolList.find((val) => val.name == this.school).id
           }
 
-          await pb.collection('Participant').create({
+          const newParticipant = await pb.collection('Participant').create({
             email: this.email,
             emailVisibility: true,
             First_Name: this.fullName.split(' ').slice(0, -1).join(' '),
@@ -195,6 +214,14 @@ export default defineComponent({
             Bus_Avail: this.willAvailBus == 'Yes',
             paid: false
           })
+
+          if (this.isCA == 'Yes') {
+            await pb.collection('CA_Reg').create({
+              Participant: newParticipant.id,
+              Expected_Number: this.expectedNumber
+            })
+          }
+
           await pb.collection('Participant').requestVerification(this.email)
           await pb.collection('Participant').authWithPassword(this.email, this.password)
           this.mainStore.login()
@@ -292,7 +319,7 @@ select {
   color: black;
 }
 
-#bus-avail-container {
+#bus-avail-container, #ca-container {
   flex-direction: row;
   justify-content: center;
 }
