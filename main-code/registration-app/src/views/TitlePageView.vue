@@ -63,11 +63,11 @@ export default defineComponent({
 button {
   border: none;
   padding: 10px;
-  background-color: rgba(166, 81, 7, 0.5);
+  background-color: rgba(0, 0, 0, 0.5);
 }
 
 button:hover {
-  background-color: rgba(128, 61, 3, 0.5);
+  background-color: rgba(12, 12, 12, 0.5);
 }
 
 h1,

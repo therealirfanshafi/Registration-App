@@ -15,6 +15,8 @@ import { faCheck } from '@fortawesome/free-solid-svg-icons'
 import { faXmark } from '@fortawesome/free-solid-svg-icons'
 library.add(faInstagram, faFacebook, faGithub, faCheck, faXmark)
 
+import { install } from 'vue3-recaptcha-v2'
+
 import CustomFooter from './components/CustomFooter.vue'
 import LoadingSpinner from './components/LoadingSpinner.vue'
 
@@ -22,6 +24,9 @@ const app = createApp(App)
 
 app.use(createPinia())
 app.use(router)
+app.use(install, {
+  sitekey: '6Ldp2pYqAAAAALmpt3wO2GIL9MPO5QnCe8o4bO4f'
+})
 
 app.component('font-awesome-icon', FontAwesomeIcon)
 

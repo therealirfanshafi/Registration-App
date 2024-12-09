@@ -6,8 +6,18 @@
         Warning: You cannnot change any information once you create the account.
       </h3>
       <div class="logical-input-group">
-        <label for="full-name" style="flex-direction: row; align-items: last baseline;">Full Name<span style="font-size: 0.5rem; margin: 5px">(This will be used in certificates)</span></label>
-        <input type="text" id="full-name" v-model="fullName" autocomplete="off" :class="{ error: !validateFullName && fullName !== '' }"/>
+        <label for="full-name" style="flex-direction: row; align-items: last baseline"
+          >Full Name<span style="font-size: 0.5rem; margin: 5px"
+            >(This will be used in certificates)</span
+          ></label
+        >
+        <input
+          type="text"
+          id="full-name"
+          v-model="fullName"
+          autocomplete="off"
+          :class="{ error: !validateFullName && fullName !== '' }"
+        />
         <p class="error-message" v-if="!validateFullName && fullName !== ''">Invalid Full Name</p>
       </div>
       <div class="same-line">
@@ -106,7 +116,7 @@
         </div>
       </div>
       <div v-else-if="school !== ''">
-        <p style="text-align: center;">Do you want to register as a Campus Ambassador?</p>
+        <p style="text-align: center">Do you want to register as a Campus Ambassador?</p>
         <div id="ca-container">
           <div class="radio-options">
             <label for="ca-yes">Yes</label>
@@ -118,10 +128,13 @@
           </div>
         </div>
         <div v-if="isCA == 'Yes'">
-          <label for="expected-number" style="text-align: center;">How many students do you expect to bring?</label>
-          <input type="number" name="" id="expected-number" v-model="expectedNumber">
+          <label for="expected-number" style="text-align: center"
+            >How many students do you expect to bring?</label
+          >
+          <input type="number" name="" id="expected-number" v-model="expectedNumber" />
         </div>
       </div>
+      <RecaptchaV2 @load-callback="botValidation" />
       <p
         class="error-message"
         style="align-self: center"
@@ -129,6 +142,10 @@
       >
         All fields are required
       </p>
+      <p class="error-message" style="align-self: center" v-if="!botValidated && submitCount >= 1">
+        Complete the captcha correctly
+      </p>
+
       <input type="submit" value="Sign up" id="submit" />
       <p class="error-message" v-if="error">An unexpected error occured</p>
     </form>
@@ -139,6 +156,7 @@
 import { useMainStore } from '@/stores/mainStore'
 import { mapStores } from 'pinia'
 import { defineComponent } from 'vue'
+import { RecaptchaV2 } from 'vue3-recaptcha-v2'
 import pb from '@/pocketbase'
 
 export default defineComponent({
@@ -156,6 +174,8 @@ export default defineComponent({
     )
   },
 
+  components: { RecaptchaV2 },
+
   data() {
     return {
       schoolList: [{ name: '', id: '' }],
@@ -169,6 +189,7 @@ export default defineComponent({
       willAvailBus: 'No',
       isCA: 'No',
       expectedNumber: 0,
+      botValidated: false,
       submitCount: 0,
       emailsUsed: [''],
       error: false,
@@ -186,7 +207,8 @@ export default defineComponent({
         this.validatePhoneNum &&
         this.validatePassword &&
         this.validateConfirmPassword &&
-        this.validatePresence
+        this.validatePresence &&
+        this.botValidated
       ) {
         const category_id = (
           await pb.collection('Category').getList(1, 30, {
@@ -231,6 +253,16 @@ export default defineComponent({
         location.reload()
         this.$router.push({ name: 'verification' })
       }
+    },
+
+    async botValidation(response) {
+      const resp = await fetch(`${pb.baseURL}/captcha-verify`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: response })
+      })
+      this.botValidated = (await resp.json()).success
+      console.error(this.botValidated)
     }
   },
 
@@ -319,7 +351,8 @@ select {
   color: black;
 }
 
-#bus-avail-container, #ca-container {
+#bus-avail-container,
+#ca-container {
   flex-direction: row;
   justify-content: center;
 }

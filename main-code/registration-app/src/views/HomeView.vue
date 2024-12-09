@@ -107,6 +107,7 @@ export default defineComponent({
       this.$router.replace({ name: 'verification' })
     }
 
+
     const segmentIntermediate1 = await pb.collection('Solo_Segment_Participant').getFullList({
       fields: 'Segment, expand',
       filter: `Participant = "${pb.authStore.record.id}"`,
