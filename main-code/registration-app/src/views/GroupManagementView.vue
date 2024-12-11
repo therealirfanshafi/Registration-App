@@ -146,6 +146,16 @@ export default defineComponent({
         fields: 'Name'
       })
     ).map((val) => val.Name.toLowerCase())
+
+    const numSeatsLeftIntermediate = await pb.collection('Participant').getList(1, 300, {
+      filter: 'Paid = true'
+    })
+    const numSeatsLeft = 300 - numSeatsLeftIntermediate.items.length
+
+    if (numSeatsLeft < 0 || this.mainStore.shutDown) {
+      this.$router.replace({ name: 'home' })
+    }
+
     this.dataReady = true
   },
 

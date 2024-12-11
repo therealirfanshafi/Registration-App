@@ -10,7 +10,7 @@
     >
       Logout
     </button>
-    <div class="card" id="payment-card">
+    <div class="card" id="payment-card" v-if="isActive">
       <h1>Payment</h1>
       <h2 style="text-align: center" v-if="!paid && !filledConfirmation">
         Confirm your payment to earn your spot in the fest.
@@ -28,17 +28,28 @@
         Confirm Payment
       </button>
     </div>
+    <div class="card" id="payment-card" v-else>
+      <h1>Payment</h1>
+      <h2 style="text-align: center" v-if="!paid && !filledConfirmation">
+        You have not paid and can no longer pay.
+      </h2>
+      <p v-if="!paid && !filledConfirmation">{{ numSeatsLeft }} seats left</p>
+      <h2 v-else-if="filledConfirmation && !paid">
+        We will review your payment. You will receive a confirmation mail once verified.
+      </h2>
+      <h2 v-else>We have verified your payment. Enjoy the fest.</h2>
+    </div>
     <div class="card" id="segment-card">
       <h1>Your Segments</h1>
       <ul v-if="segments.length">
         <li v-for="(item, index) of segments" :key="index">{{ item }}</li>
       </ul>
       <h2 v-else>You did not register for any segment yet</h2>
-      <button class="default-button" @click="$router.push({ name: 'segmentManage' })">Edit</button>
+      <button class="default-button" @click="$router.push({ name: 'segmentManage' })" v-if="isActive">Edit</button>
     </div>
     <div class="card" id="group-card">
-      <h1>Group Requests</h1>
-      <ul id="grp-req-list" v-if="groupRequests.length">
+      <h1 v-if="isActive">Group Requests</h1>
+      <ul id="grp-req-list" v-if="groupRequests.length && isActive">
         <li v-for="(item, index) of groupRequests" :key="index">
           <div>{{ item }}</div>
           <div class="icon-container">
@@ -57,13 +68,13 @@
           </div>
         </li>
       </ul>
-      <h2 v-else>You have no requests</h2>
+      <h2 v-else-if="isActive">You have no requests</h2>
       <h1>Your Groups</h1>
       <ul v-if="yourGroups.length">
         <li v-for="(item, index) of yourGroups" :key="index">{{ item }}</li>
       </ul>
       <h2 v-else>You are currently not in any group</h2>
-      <button class="default-button" @click="$router.push({ name: 'groupManage' })">
+      <button class="default-button" @click="$router.push({ name: 'groupManage' })" v-if="isActive">
         Manage Groups
       </button>
     </div>
@@ -98,7 +109,6 @@ import { useMainStore } from '@/stores/mainStore'
 import { mapStores } from 'pinia'
 import { defineComponent } from 'vue'
 
-
 export default defineComponent({
   async mounted() {
     if (!this.mainStore.loggedIn) {
@@ -106,7 +116,6 @@ export default defineComponent({
     } else if (!this.mainStore.verified) {
       this.$router.replace({ name: 'verification' })
     }
-
 
     const segmentIntermediate1 = await pb.collection('Solo_Segment_Participant').getFullList({
       fields: 'Segment, expand',
@@ -124,7 +133,7 @@ export default defineComponent({
     } else {
       this.yourGroups = []
     }
-
+    
     const segmentIntermediate2 = await pb.collection('Group_Segment_Group').getFullList({
       fields: 'Segment, expand, Submission',
       filter: `Group.Members.id ?= "${pb.authStore.record.id}"`,
@@ -257,6 +266,11 @@ export default defineComponent({
   },
 
   computed: {
+
+    isActive() {
+      return !this.mainStore.shutDown && this.numSeatsLeft > 0
+    },
+
     ...mapStores(useMainStore)
   }
 })

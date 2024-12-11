@@ -4,18 +4,28 @@
     <h3>Presented by: <br />Sunnydale Math x Tech Club & Sunnydale Robotics Club</h3>
     <h2>The fate of the world rests on your shoulders</h2>
     <h2>Can you fix the timeline?</h2>
-    <p id="seat-count">{{ numSeatsLeft }} seats left</p>
-    <div class="column-centering" id="sign-up-container">
-      <p>What are you waiting for?</p>
-      <RouterLink :to="{ name: 'registration' }">
-        <button id="sign-up-button">Sign Up Today</button>
-      </RouterLink>
+    <div v-if="!mainStore.shutDown && numSeatsLeft > 0" id="registration-container">
+      <p id="seat-count">{{ numSeatsLeft }} seats left</p>
+      <div class="column-centering" id="sign-up-container">
+        <p>What are you waiting for?</p>
+        <RouterLink :to="{ name: 'registration' }">
+          <button id="sign-up-button">Sign Up Today</button>
+        </RouterLink>
+      </div>
+      <div class="column-centering" id="login-container">
+        <p>Already signed up?</p>
+        <RouterLink :to="{ name: 'login' }">
+          <button id="login-button">Login Instead</button>
+        </RouterLink>
+      </div>
     </div>
-    <div class="column-centering" id="login-container">
-      <p>Already signed up?</p>
-      <RouterLink :to="{ name: 'login' }">
-        <button id="login-button">Login Instead</button>
-      </RouterLink>
+    <div v-else id="shut-down">
+      <h3>We have shut down registration. You may still login to see your details.</h3>
+      <div class="column-centering" id="login-container">
+        <RouterLink :to="{ name: 'login' }">
+          <button id="login-button">Login</button>
+        </RouterLink>
+      </div>
     </div>
   </main>
   <LoadingSpinner v-else></LoadingSpinner>
@@ -105,6 +115,16 @@ p {
 #seat-count {
   color: #f3292d;
   margin: 30px;
+}
+
+#registration-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#shut-down {
+  margin-top: 50px;
 }
 
 #sign-up-container {
