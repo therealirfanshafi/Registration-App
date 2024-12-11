@@ -8,6 +8,7 @@ import SegmentManagementView from '@/views/SegmentManagementView.vue'
 import ProjectSubmissionView from '@/views/ProjectSubmissionView.vue'
 import GroupManagementView from '@/views/GroupManagementView.vue'
 import VerifyEmail from '@/views/VerifyEmail.vue'
+import NotFound from '@/views/NotFound.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -56,7 +57,8 @@ const router = createRouter({
       path: '/verify-mail',
       name: 'verification',
       component: VerifyEmail
-    }
+    },
+    { path: '/:pathMatch(.*)*', name: 'NotFound', component: NotFound }
   ]
 })
 
