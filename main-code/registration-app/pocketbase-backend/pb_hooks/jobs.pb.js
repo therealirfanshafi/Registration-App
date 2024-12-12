@@ -18,7 +18,7 @@ cronAdd('createReports', '0 3 * * *', () => {
 
         const mainData = $app.findRecordById('Public_Relations', 'c4a3kyp8vrktfgb')
         mainData.set('Report', json_data)
-        $app.saveRecord(mainData)
+        $app.save(mainData)
 
         json_data = []
         const busList = $app.findRecordsByFilter(
@@ -26,13 +26,13 @@ cronAdd('createReports', '0 3 * * *', () => {
             'Paid = true && Bus_Avail = true',
             '', 0, 0
         )
-        $app.expandRecords(busList, ['School', 'Category'])
+        $app.expandRecords(busList, ['Category'])
         for (let item of busList) {
-            json_data.push({"First Name": item.get('First_Name'), "Last Name": item.get('Last_Name'), School: item.expandedOne('School').get('Name'), Class: item.expandedOne('Category').get('Class'), Email: item.get('email'), "Phone Number": item.get('Phone_Number')})
+            json_data.push({"First Name": item.get('First_Name'), "Last Name": item.get('Last_Name'), Class: item.expandedOne('Category').get('Class'), Email: item.get('email'), "Phone Number": item.get('Phone_Number')})
         }
         const busListData = $app.findRecordById('Public_Relations', 'c1exukcknnk7h34')
         busListData.set('Report', json_data)
-        $app.saveRecord(busListData)
+        $app.save(busListData)
 
         let segmentRecord
         let segmentParticipants
@@ -52,7 +52,7 @@ cronAdd('createReports', '0 3 * * *', () => {
                 json_data.push({"First Name": item.get('First_Name'), "Last Name": item.get('Last_Name'), School: item.expandedOne('School').get('Name'), Class: item.expandedOne('Category').get('Class'), Email: item.get('email'), "Phone Number": item.get('Phone_Number')})
             }
             segmentRecord.set('Report', json_data)
-            $app.saveRecord(segmentRecord)
+            $app.save(segmentRecord)
         }
         const groupSegmentList =  $app.findRecordsByFilter('Group_Segment', 'Name != ""', '', 0, 0).map((val) => val.get('Name'))
         for (let segment of groupSegmentList) {
@@ -73,7 +73,7 @@ cronAdd('createReports', '0 3 * * *', () => {
                 }
             }
             segmentRecord.set('Report', json_data)
-            $app.saveRecord(segmentRecord)
+            $app.save(segmentRecord)
                
         }
 
