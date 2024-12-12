@@ -9,5 +9,5 @@ routerAdd('POST', '/captcha-verify', (e) => {
     method: 'POST'
   })
 
-  return e.json('200', { success: response.json.success, love: 'war' })
+  return e.json('200', { success: response.json.success})
 })

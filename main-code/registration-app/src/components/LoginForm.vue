@@ -17,12 +17,16 @@
         <label for="password">Password</label>
         <input type="password" id="password" v-model="password" />
       </div>
+      <RecaptchaV2 @load-callback="botValidation" @expired-callback="botValidated = false"/>
       <p
         class="error-message"
         style="align-self: center"
         v-if="!validatePresence && submitCount >= 1"
       >
         All fields are required
+      </p>
+      <p class="error-message" style="align-self: center" v-if="!botValidated && submitCount >= 1">
+        Complete the captcha correctly
       </p>
       <p class="error-message" style="align-self: center" v-if="authFailCount >= 1">
         Email and password do not match
@@ -37,21 +41,26 @@ import pb from '@/pocketbase'
 import { useMainStore } from '@/stores/mainStore'
 import { mapStores } from 'pinia'
 import { defineComponent } from 'vue'
+import { RecaptchaV2 } from 'vue3-recaptcha-v2';
 
 export default defineComponent({
+
+  components: {RecaptchaV2},
+
   data() {
     return {
       email: '',
       password: '',
       submitCount: 0,
-      authFailCount: 0
+      authFailCount: 0,
+      botValidated: false
     }
   },
 
   methods: {
     async authenticateUser() {
       this.submitCount++
-      if (this.validateEmail && this.validatePresence) {
+      if (this.validateEmail && this.validatePresence && this.botValidated) {
         try {
           await pb.collection('Participant').authWithPassword(this.email, this.password)
           this.mainStore.login()
@@ -59,6 +68,16 @@ export default defineComponent({
           this.authFailCount += 1
         }
       }
+    },
+
+    async botValidation(response) {
+      const resp = await fetch(`${pb.baseURL}/captcha-verify`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: response })
+      })
+      this.botValidated = (await resp.json()).success
+      console.error(this.botValidated)
     }
   },
 

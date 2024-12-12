@@ -134,7 +134,7 @@
           <input type="number" name="" id="expected-number" v-model="expectedNumber" />
         </div>
       </div>
-      <RecaptchaV2 @load-callback="botValidation" />
+      <RecaptchaV2 @load-callback="botValidation" @expired-callback="botValidated =false"/>
       <p
         class="error-message"
         style="align-self: center"
