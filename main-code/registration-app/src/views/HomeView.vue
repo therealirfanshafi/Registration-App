@@ -238,15 +238,19 @@ export default defineComponent({
           'Members+': pb.authStore.record.id
         })
 
-        const grpReq = (
-          await pb.collection('Group_Requests').getFullList({
-            fields: 'id',
-            filter: `Group = "${grp}" && Participant = "${pb.authStore.record.id}"`
-          })
-        )[0].id
+        try {
+          const grpReq = (
+            await pb.collection('Group_Requests').getFullList({
+              fields: 'id',
+              filter: `Group = "${grp}" && Participant = "${pb.authStore.record.id}"`
+            })
+          )[0].id
 
-        await pb.collection('Group_Requests').delete(grpReq)
-
+          await pb.collection('Group_Requests').delete(grpReq)
+        } catch(e) {
+          console.log(e)
+        }
+        
         this.yourGroups.push(this.groupRequests[index])
         this.groupRequests.splice(index, 1)
       }

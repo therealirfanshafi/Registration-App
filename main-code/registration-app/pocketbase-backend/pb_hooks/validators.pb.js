@@ -25,7 +25,14 @@ onRecordUpdateRequest((e) => {
             }
         }
     }
+    if (e.record.get('Members').length == 4) {
+        const grpRequests = $app.findRecordsByFilter('Group_Requests', `Group = "${e.record.id}"`, '', 0, 0)
+    
+        for (let req of grpRequests) {
+            $app.delete(req)
 
+        }
+    }
     e.next()
 
 }, 'Group')
