@@ -17,6 +17,7 @@
               <label :for="`${item.name}-input`" style="font-size: 1rem">New member email</label>
               <input type="email" :id="`${item.name}-input`" v-model="item.memberReq" />
               <button @click="addMember(index1)" class="default-button">Add member</button>
+              <p v-if="item.members.length < 2">At least 2 members are required <br>to register for group segments</p>
               <p v-if="item.invalidEmail">Email does not exist</p>
               <p v-if="item.memberAlreadyinGrp">Member already in group</p>
               <p v-if="item.wrongCategory">This member is in a different category from you</p>
@@ -46,12 +47,12 @@
       <div id="manage-segments-container">
         <h1 style="color: rgb(189, 129, 18)">Manage Group segments</h1>
         <div class="card">
-          <div v-for="(item, index1) of segments" :key="index1" class="group-segment-relators">
+          <div v-for="(item, index1) of segments.filter((val) => !val.shutDown)" :key="index1" class="group-segment-relators">
             <label :for="item.name">{{ item.name }}</label>
             <select :id="item.name" v-model="item.group" v-if="item.isAdmin || !item.group">
               <option :value="null">None</option>
               <option
-                v-for="(group, index2) of groups.filter((val) => val.isAdmin)"
+                v-for="(group, index2) of groups.filter((val) => val.isAdmin && val.members.length >= 2)"
                 :key="index2"
                 :value="group.name"
               >
@@ -113,7 +114,7 @@ export default defineComponent({
     )
 
     const grpSegmentIntermediate1 = await pb.collection('Group_Segment').getFullList({
-      fields: 'id, Name'
+      fields: 'id, Name, Shut_Down, Group_Size, Exact_Size'
     })
 
     const grpSegmentIntermediate2 = await pb.collection('Group_Segment_Group').getFullList({
@@ -130,7 +131,10 @@ export default defineComponent({
         isAdmin: true,
         segmentID: val1.id,
         groupID: null,
-        recordID: ''
+        recordID: '',
+        shutDown: val1.Shut_Down,
+        groupSize: val1.Group_Size,
+        exactSize: val1.Exact_Size
       }
       const temp1 = grpSegmentIntermediate2.find((val2) => val2.expand.Segment.Name == val1.Name)
       if (temp1) {
@@ -176,12 +180,12 @@ export default defineComponent({
       groups: [{ name: '', members: [''], isAdmin: false, adminName: '', memberReq: '', invalidEmail: false, memberAlreadyinGrp: false, wrongCategory: false, reqAlreadySent: false}],
       groupList: [''],
       oldSegments: [
-        { name: '', group: null, isAdmin: false, segmentID: '', groupID: null, recordID: null },
-        { name: '', group: '', isAdmin: false, segmentID: '', groupID: '', recordID: '' }
+        { name: '', group: null, isAdmin: false, segmentID: '', groupID: null, recordID: null, shutDown: false, groupSize: 0, exactSize: false },
+        { name: '', group: '', isAdmin: false, segmentID: '', groupID: '', recordID: '', shutDown: false, groupSize: 0, exactSize: false }
       ],
       segments: [
-        { name: '', group: null, isAdmin: false, segmentID: '', groupID: null, recordID: null },
-        { name: '', group: '', isAdmin: false, segmentID: '', groupID: '', recordID: '' }
+        { name: '', group: null, isAdmin: false, segmentID: '', groupID: null, recordID: null, shutDown: false, groupSize: 0, exactSize: false },
+        { name: '', group: '', isAdmin: false, segmentID: '', groupID: '', recordID: '', shutDown: false, groupSize: 0, exactSize: false }
       ],
       newGroup: '',
       dataReady: false
@@ -238,13 +242,34 @@ export default defineComponent({
           if (memCategory != groupIntermediate.expand.Admin.expand.Category.Category) {
             this.groups[index].wrongCategory = true
           } else {
-            try {
-              await pb.collection('Group_Requests').create({
-                Group: grp,
-                Participant: member
-              })
-            } catch {
-              this.groups[index].reqAlreadySent = true
+            let proceed = false
+            let collision = false
+            for (let i = 0; i < this.oldSegments.length; i++ ) {
+              if (this.oldSegments[i].group == this.groups[index].name && (this.oldSegments[i].exactSize || this.groups[index].members.length == this.oldSegments[i].groupSize)) {
+                collision = true
+                if (!proceed) {
+                  proceed = confirm(`Adding a member will cause your registration from some segments to be removed. Do you wish to proceed?`)
+                }
+                if (proceed) {
+                  this.oldSegments[i].group = null
+                  this.segments[i].group = null
+                  await pb.collection('Group_Segment_Group').delete(this.segments[i].recordID)
+                  this.oldSegments[i].recordID = ''
+                  this.segments[i].recordID = ''
+                } else {
+                  break
+                }
+              }
+            }
+            if (!collision || proceed) {
+              try {
+                await pb.collection('Group_Requests').create({
+                  Group: grp,
+                  Participant: member
+                })
+              } catch {
+                this.groups[index].reqAlreadySent = true
+              }
             }
           }
         }
@@ -268,26 +293,48 @@ export default defineComponent({
     },
     async removeMember(index1: number, index2: number) {
       if (confirm('Are you sure you want to remove this member?')) {
-        const grp = (
-          await pb.collection('Group').getFullList({
-            fields: 'id',
-            filter: `Name = "${this.groups[index1].name}"`
-          })
-        )[0].id
-        const mem = await pb.collection('Participant').getFullList({
-          fields: 'id',
-          filter: `First_Name = "${this.groups[index1].members[index2].split(' ').slice(0, -1).join(' ')}" && Last_Name = "${this.groups[index1].members[index2].split(' ').pop()}"`
-        })
-        for (let ids of mem) {
-          try {
-            await pb.collection('Group').update(grp, {
-              'Members-': ids.id
-            })
-          } catch (e) {
-            console.log(e)
+        let proceed = false
+        let collision = false
+        for (let i = 0; i < this.oldSegments.length; i++ ) {
+          if (this.oldSegments[i].group == this.groups[index1].name && (this.oldSegments[i].exactSize || this.groups[index1].members.length == 2)) {
+            collision = true
+            if (!proceed) {
+              proceed = confirm(`Adding a member will cause your registration from ${this.groups[index1].members.length == 2 ? 'all': 'some'} segments to be removed. Do you wish to proceed?`)
+            }
+            if (proceed) {
+              this.oldSegments[i].group = null
+              this.segments[i].group = null
+              await pb.collection('Group_Segment_Group').delete(this.segments[i].recordID)
+              this.oldSegments[i].recordID = ''
+              this.segments[i].recordID = ''
+            } else {
+              break
+            }
           }
         }
-        this.groups[index1].members.splice(index2, 1)
+        if (!collision || proceed) {
+          const grp = (
+            await pb.collection('Group').getFullList({
+              fields: 'id',
+              filter: `Name = "${this.groups[index1].name}"`
+            })
+          )[0].id
+          const mem = await pb.collection('Participant').getFullList({
+            fields: 'id',
+            filter: `First_Name = "${this.groups[index1].members[index2].split(' ').slice(0, -1).join(' ')}" && Last_Name = "${this.groups[index1].members[index2].split(' ').pop()}"`
+          })
+          for (let ids of mem) {
+            try {
+              await pb.collection('Group').update(grp, {
+                'Members-': ids.id
+              })
+            } catch (e) {
+              console.log(e)
+            }
+          }
+          this.groups[index1].members.splice(index2, 1)
+        }
+        
       }
     },
     async saveChanges() {
@@ -295,22 +342,37 @@ export default defineComponent({
         if (this.oldSegments[i].group != this.segments[i].group && this.segments[i].group) {
           const grp = (
             await pb.collection('Group').getFullList({
-              fields: 'id',
+              fields: 'id, Members',
               filter: `Name = "${this.segments[i].group}"`
             })
-          )[0].id
-          try {
-            this.segments[i].recordID = (
-              await pb.collection('Group_Segment_Group').create({
-                Segment: this.oldSegments[i].segmentID,
-                Group: grp
-              })
-            ).id
-          } catch (error) {
-            alert(
-              `A member in ${this.segments[i].group} is already registered for ${this.segments[i].name}`
-            )
+          )[0]
+
+          const grpReq = await pb.collection('Group_Requests').getFullList({
+            fields: 'id',
+            filter: `Group = "${grp.id}"`
+          })
+
+
+          if (this.segments[i].exactSize && (this.segments[i].groupSize != grp.Members.length || grpReq.length > 0)) {
+            alert(`${this.segments[i].name} requires exactly ${this.segments[i].groupSize} members but ${this.segments[i].group} has ${this.segments[i].groupSize == grp.Members.length ? grp.Members.length + grpReq.length : grp.Members.length} members ${this.segments[i].groupSize == grp.Members.length ? '(including unconfirmed group requests)': ''}`)
             this.segments[i].group = this.oldSegments[i].group
+          } else if (this.segments[i].groupSize !== 0 && grp.Members.length + grpReq.length > this.segments[i].groupSize) {
+            alert(`Teams for ${this.segments[i].name} can have at most ${this.segments[i].groupSize} members but ${this.segments[i].group} has ${grp.Members.length + grpReq.length} members (including unaccepted group requests)`)
+            this.segments[i].group = this.oldSegments[i].group
+          } else{
+            try {
+              this.segments[i].recordID = (
+                await pb.collection('Group_Segment_Group').create({
+                  Segment: this.oldSegments[i].segmentID,
+                  Group: grp.id
+                })
+              ).id
+            } catch (error) {
+              alert(
+                `A member in ${this.segments[i].group} is already registered for ${this.segments[i].name}`
+              )
+              this.segments[i].group = this.oldSegments[i].group
+            }
           }
         } else if (this.oldSegments[i].group != this.segments[i].group) {
           await pb.collection('Group_Segment_Group').delete(this.segments[i].recordID)
