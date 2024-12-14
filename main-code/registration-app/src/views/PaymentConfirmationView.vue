@@ -12,7 +12,7 @@
         <li>Use the "Send Money" feature on Bkash to send the fee.</li>
         <li>When paying, include your full name and institution details in the reference.</li>
         <li>
-          Use the Bkash number 01716657921, and the total amount to be paid is Tk 2,040 (Tk 2,000
+          Use the Bkash number 01968473363, and the total amount to be paid is Tk 2,040 (Tk 2,000
           fee + Tk 40 service charge).
         </li>
       </ul>

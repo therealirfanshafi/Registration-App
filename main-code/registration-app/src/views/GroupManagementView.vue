@@ -17,10 +17,10 @@
               <label :for="`${item.name}-input`" style="font-size: 1rem">New member email</label>
               <input type="email" :id="`${item.name}-input`" v-model="item.memberReq" />
               <button @click="addMember(index1)" class="default-button">Add member</button>
-              <p v-if="invalidEmail">Email does not exist</p>
-              <p v-if="memberAlreadyinGrp">Member already in group</p>
-              <p v-if="wrongCategory">This member is in a different category from you</p>
-              <p v-if="reqlAlreadySent">Request for this member already sent</p>
+              <p v-if="item.invalidEmail">Email does not exist</p>
+              <p v-if="item.memberAlreadyinGrp">Member already in group</p>
+              <p v-if="item.wrongCategory">This member is in a different category from you</p>
+              <p v-if="item.reqAlreadySent">Request for this member already sent</p>
             </div>
 
             <ul>
@@ -104,7 +104,11 @@ export default defineComponent({
         ),
         isAdmin: val.Admin == pb.authStore.record.id,
         adminName: val.expand.Admin.First_Name + ' ' + val.expand.Admin.Last_Name,
-        memberReq: ''
+        memberReq: '',
+        invalidEmail: false,
+        memberAlreadyinGrp: false,
+        wrongCategory: false,
+        reqAlreadySent: false,
       })
     )
 
@@ -169,7 +173,7 @@ export default defineComponent({
 
   data() {
     return {
-      groups: [{ name: '', members: [''], isAdmin: false, adminName: '', memberReq: '' }],
+      groups: [{ name: '', members: [''], isAdmin: false, adminName: '', memberReq: '', invalidEmail: false, memberAlreadyinGrp: false, wrongCategory: false, reqAlreadySent: false}],
       groupList: [''],
       oldSegments: [
         { name: '', group: null, isAdmin: false, segmentID: '', groupID: null, recordID: null },
@@ -180,10 +184,6 @@ export default defineComponent({
         { name: '', group: '', isAdmin: false, segmentID: '', groupID: '', recordID: '' }
       ],
       newGroup: '',
-      invalidEmail: false,
-      memberAlreadyinGrp: false,
-      wrongCategory: false,
-      reqlAlreadySent: false,
       dataReady: false
     }
   },
@@ -200,16 +200,20 @@ export default defineComponent({
           members: [pb.authStore.record.First_Name + ' ' + pb.authStore.record.Last_Name],
           isAdmin: true,
           adminName: pb.authStore.record.First_Name + ' ' + pb.authStore.record.Last_Name,
-          memberReq: ''
+          memberReq: '',
+          invalidEmail: false,
+          memberAlreadyinGrp: false,
+          wrongCategory: false,
+          reqAlreadySent: false,
         })
         this.newGroup = ''
       }
     },
     async addMember(index: number) {
-      this.invalidEmail = false
-      this.memberAlreadyinGrp = false
-      this.wrongCategory = false
-      this.reqlAlreadySent = false
+      this.groups[index].invalidEmail = false
+      this.groups[index].memberAlreadyinGrp = false
+      this.groups[index].wrongCategory = false
+      this.groups[index].reqAlreadySent = false
 
       let member: RecordModel[] | string = await pb.collection('Participant').getFullList({
         fields: 'id, Category, expand',
@@ -217,7 +221,7 @@ export default defineComponent({
         expand: 'Category'
       })
       if (member.length == 0) {
-        this.invalidEmail = true
+        this.groups[index].invalidEmail = true
       } else {
         const memCategory = member[0].expand.Category.Category
         member = member[0].id
@@ -229,10 +233,10 @@ export default defineComponent({
         )[0]
         const grp = groupIntermediate.id
         const members: string[] = groupIntermediate.Members
-        this.memberAlreadyinGrp = members.includes(member)
-        if (!this.memberAlreadyinGrp) {
+        this.groups[index].memberAlreadyinGrp = members.includes(member)
+        if (!this.groups[index].memberAlreadyinGrp) {
           if (memCategory != groupIntermediate.expand.Admin.expand.Category.Category) {
-            this.wrongCategory = true
+            this.groups[index].wrongCategory = true
           } else {
             try {
               await pb.collection('Group_Requests').create({
@@ -240,7 +244,7 @@ export default defineComponent({
                 Participant: member
               })
             } catch {
-              this.reqlAlreadySent = true
+              this.groups[index].reqAlreadySent = true
             }
           }
         }
