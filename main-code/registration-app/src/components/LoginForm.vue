@@ -17,7 +17,11 @@
         <label for="password">Password</label>
         <input type="password" id="password" v-model="password" />
       </div>
-      <RecaptchaV2 @load-callback="botValidation" @expired-callback="botValidated = false"/>
+      <RecaptchaV2
+        @load-callback="botValidation"
+        @expired-callback="botValidated = false"
+        id="captcha"
+      />
       <p
         class="error-message"
         style="align-self: center"
@@ -41,11 +45,10 @@ import pb from '@/pocketbase'
 import { useMainStore } from '@/stores/mainStore'
 import { mapStores } from 'pinia'
 import { defineComponent } from 'vue'
-import { RecaptchaV2 } from 'vue3-recaptcha-v2';
+import { RecaptchaV2 } from 'vue3-recaptcha-v2'
 
 export default defineComponent({
-
-  components: {RecaptchaV2},
+  components: { RecaptchaV2 },
 
   data() {
     return {
@@ -106,6 +109,7 @@ form * {
 
 form {
   padding: 40px;
+  min-width: fit-content;
   width: 80%;
 }
 
@@ -141,6 +145,10 @@ input {
 .error-message {
   font-size: 0.75rem;
   color: rgb(250, 179, 0);
+}
+
+#captcha {
+  align-self: center;
 }
 
 @media screen and (min-width: 620px) {

@@ -45,7 +45,13 @@
         <li v-for="(item, index) of segments" :key="index">{{ item }}</li>
       </ul>
       <h2 v-else>You did not register for any segment yet</h2>
-      <button class="default-button" @click="$router.push({ name: 'segmentManage' })" v-if="isActive">Edit</button>
+      <button
+        class="default-button"
+        @click="$router.push({ name: 'segmentManage' })"
+        v-if="isActive"
+      >
+        Edit
+      </button>
     </div>
     <div class="card" id="group-card">
       <h1 v-if="isActive">Group Requests</h1>
@@ -133,7 +139,7 @@ export default defineComponent({
     } else {
       this.yourGroups = []
     }
-    
+
     const segmentIntermediate2 = await pb.collection('Group_Segment_Group').getFullList({
       fields: 'Segment, expand, Submission',
       filter: `Group.Members.id ?= "${pb.authStore.record.id}"`,
@@ -247,10 +253,10 @@ export default defineComponent({
           )[0].id
 
           await pb.collection('Group_Requests').delete(grpReq)
-        } catch(e) {
+        } catch (e) {
           console.log(e)
         }
-        
+
         this.yourGroups.push(this.groupRequests[index])
         this.groupRequests.splice(index, 1)
       }
@@ -270,7 +276,6 @@ export default defineComponent({
   },
 
   computed: {
-
     isActive() {
       return !this.mainStore.shutDown && this.numSeatsLeft > 0
     },

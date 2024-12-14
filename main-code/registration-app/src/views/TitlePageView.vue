@@ -104,7 +104,6 @@ h2 {
 
 h3 {
   font-size: 1rem;
-  color: #f38c33;
   margin-bottom: 30px;
 }
 
@@ -113,7 +112,7 @@ p {
 }
 
 #seat-count {
-  color: #f3292d;
+  color: #ff0000;
   margin: 30px;
 }
 

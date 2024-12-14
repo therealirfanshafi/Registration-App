@@ -134,7 +134,11 @@
           <input type="number" name="" id="expected-number" v-model="expectedNumber" />
         </div>
       </div>
-      <RecaptchaV2 @load-callback="botValidation" @expired-callback="botValidated =false"/>
+      <RecaptchaV2
+        @load-callback="botValidation"
+        @expired-callback="botValidated = false"
+        id="captcha"
+      />
       <p
         class="error-message"
         style="align-self: center"
@@ -368,6 +372,10 @@ select {
 .error-message {
   font-size: 0.75rem;
   color: rgb(250, 179, 0);
+}
+
+#captcha {
+  align-self: center;
 }
 
 @media screen and (min-width: 620px) {

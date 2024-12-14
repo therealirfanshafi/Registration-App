@@ -68,12 +68,11 @@ export default defineComponent({
     }
 
     this.dataReady = true
-    
   },
-  
+
   data() {
     return {
-      dataReady: false,
+      dataReady: false
     }
   },
 

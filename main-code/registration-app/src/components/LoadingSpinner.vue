@@ -1,9 +1,13 @@
 <template>
-    <div class="lds-ring"><div></div><div></div><div></div><div></div></div>
+  <div class="lds-ring">
+    <div></div>
+    <div></div>
+    <div></div>
+    <div></div>
+  </div>
 </template>
 
 <style scoped>
-
 .lds-ring,
 .lds-ring div {
   box-sizing: border-box;
@@ -43,6 +47,4 @@
     transform: rotate(360deg);
   }
 }
-
-
 </style>

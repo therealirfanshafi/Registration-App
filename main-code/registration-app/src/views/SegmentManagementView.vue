@@ -16,7 +16,6 @@
     </div>
   </main>
   <LoadingSpinner v-else></LoadingSpinner>
-
 </template>
 
 <script lang="ts">

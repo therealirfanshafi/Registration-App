@@ -17,7 +17,9 @@
               <label :for="`${item.name}-input`" style="font-size: 1rem">New member email</label>
               <input type="email" :id="`${item.name}-input`" v-model="item.memberReq" />
               <button @click="addMember(index1)" class="default-button">Add member</button>
-              <p v-if="item.members.length < 2">At least 2 members are required <br>to register for group segments</p>
+              <p v-if="item.members.length < 2">
+                At least 2 members are required <br />to register for group segments
+              </p>
               <p v-if="item.invalidEmail">Email does not exist</p>
               <p v-if="item.memberAlreadyinGrp">Member already in group</p>
               <p v-if="item.wrongCategory">This member is in a different category from you</p>
@@ -47,12 +49,18 @@
       <div id="manage-segments-container">
         <h1 style="color: rgb(189, 129, 18)">Manage Group segments</h1>
         <div class="card">
-          <div v-for="(item, index1) of segments.filter((val) => !val.shutDown)" :key="index1" class="group-segment-relators">
+          <div
+            v-for="(item, index1) of segments.filter((val) => !val.shutDown)"
+            :key="index1"
+            class="group-segment-relators"
+          >
             <label :for="item.name">{{ item.name }}</label>
             <select :id="item.name" v-model="item.group" v-if="item.isAdmin || !item.group">
               <option :value="null">None</option>
               <option
-                v-for="(group, index2) of groups.filter((val) => val.isAdmin && val.members.length >= 2)"
+                v-for="(group, index2) of groups.filter(
+                  (val) => val.isAdmin && val.members.length >= 2
+                )"
                 :key="index2"
                 :value="group.name"
               >
@@ -109,7 +117,7 @@ export default defineComponent({
         invalidEmail: false,
         memberAlreadyinGrp: false,
         wrongCategory: false,
-        reqAlreadySent: false,
+        reqAlreadySent: false
       })
     )
 
@@ -177,15 +185,67 @@ export default defineComponent({
 
   data() {
     return {
-      groups: [{ name: '', members: [''], isAdmin: false, adminName: '', memberReq: '', invalidEmail: false, memberAlreadyinGrp: false, wrongCategory: false, reqAlreadySent: false}],
+      groups: [
+        {
+          name: '',
+          members: [''],
+          isAdmin: false,
+          adminName: '',
+          memberReq: '',
+          invalidEmail: false,
+          memberAlreadyinGrp: false,
+          wrongCategory: false,
+          reqAlreadySent: false
+        }
+      ],
       groupList: [''],
       oldSegments: [
-        { name: '', group: null, isAdmin: false, segmentID: '', groupID: null, recordID: null, shutDown: false, groupSize: 0, exactSize: false },
-        { name: '', group: '', isAdmin: false, segmentID: '', groupID: '', recordID: '', shutDown: false, groupSize: 0, exactSize: false }
+        {
+          name: '',
+          group: null,
+          isAdmin: false,
+          segmentID: '',
+          groupID: null,
+          recordID: null,
+          shutDown: false,
+          groupSize: 0,
+          exactSize: false
+        },
+        {
+          name: '',
+          group: '',
+          isAdmin: false,
+          segmentID: '',
+          groupID: '',
+          recordID: '',
+          shutDown: false,
+          groupSize: 0,
+          exactSize: false
+        }
       ],
       segments: [
-        { name: '', group: null, isAdmin: false, segmentID: '', groupID: null, recordID: null, shutDown: false, groupSize: 0, exactSize: false },
-        { name: '', group: '', isAdmin: false, segmentID: '', groupID: '', recordID: '', shutDown: false, groupSize: 0, exactSize: false }
+        {
+          name: '',
+          group: null,
+          isAdmin: false,
+          segmentID: '',
+          groupID: null,
+          recordID: null,
+          shutDown: false,
+          groupSize: 0,
+          exactSize: false
+        },
+        {
+          name: '',
+          group: '',
+          isAdmin: false,
+          segmentID: '',
+          groupID: '',
+          recordID: '',
+          shutDown: false,
+          groupSize: 0,
+          exactSize: false
+        }
       ],
       newGroup: '',
       dataReady: false
@@ -208,7 +268,7 @@ export default defineComponent({
           invalidEmail: false,
           memberAlreadyinGrp: false,
           wrongCategory: false,
-          reqAlreadySent: false,
+          reqAlreadySent: false
         })
         this.newGroup = ''
       }
@@ -244,11 +304,17 @@ export default defineComponent({
           } else {
             let proceed = false
             let collision = false
-            for (let i = 0; i < this.oldSegments.length; i++ ) {
-              if (this.oldSegments[i].group == this.groups[index].name && (this.oldSegments[i].exactSize || this.groups[index].members.length == this.oldSegments[i].groupSize)) {
+            for (let i = 0; i < this.oldSegments.length; i++) {
+              if (
+                this.oldSegments[i].group == this.groups[index].name &&
+                (this.oldSegments[i].exactSize ||
+                  this.groups[index].members.length == this.oldSegments[i].groupSize)
+              ) {
                 collision = true
                 if (!proceed) {
-                  proceed = confirm(`Adding a member will cause your registration from some segments to be removed. Do you wish to proceed?`)
+                  proceed = confirm(
+                    `Adding a member will cause your registration from some segments to be removed. Do you wish to proceed?`
+                  )
                 }
                 if (proceed) {
                   this.oldSegments[i].group = null
@@ -295,11 +361,16 @@ export default defineComponent({
       if (confirm('Are you sure you want to remove this member?')) {
         let proceed = false
         let collision = false
-        for (let i = 0; i < this.oldSegments.length; i++ ) {
-          if (this.oldSegments[i].group == this.groups[index1].name && (this.oldSegments[i].exactSize || this.groups[index1].members.length == 2)) {
+        for (let i = 0; i < this.oldSegments.length; i++) {
+          if (
+            this.oldSegments[i].group == this.groups[index1].name &&
+            (this.oldSegments[i].exactSize || this.groups[index1].members.length == 2)
+          ) {
             collision = true
             if (!proceed) {
-              proceed = confirm(`Adding a member will cause your registration from ${this.groups[index1].members.length == 2 ? 'all': 'some'} segments to be removed. Do you wish to proceed?`)
+              proceed = confirm(
+                `Adding a member will cause your registration from ${this.groups[index1].members.length == 2 ? 'all' : 'some'} segments to be removed. Do you wish to proceed?`
+              )
             }
             if (proceed) {
               this.oldSegments[i].group = null
@@ -334,7 +405,6 @@ export default defineComponent({
           }
           this.groups[index1].members.splice(index2, 1)
         }
-        
       }
     },
     async saveChanges() {
@@ -352,14 +422,23 @@ export default defineComponent({
             filter: `Group = "${grp.id}"`
           })
 
-
-          if (this.segments[i].exactSize && (this.segments[i].groupSize != grp.Members.length || grpReq.length > 0)) {
-            alert(`${this.segments[i].name} requires exactly ${this.segments[i].groupSize} members but ${this.segments[i].group} has ${this.segments[i].groupSize == grp.Members.length ? grp.Members.length + grpReq.length : grp.Members.length} members ${this.segments[i].groupSize == grp.Members.length ? '(including unconfirmed group requests)': ''}`)
+          if (
+            this.segments[i].exactSize &&
+            (this.segments[i].groupSize != grp.Members.length || grpReq.length > 0)
+          ) {
+            alert(
+              `${this.segments[i].name} requires exactly ${this.segments[i].groupSize} members but ${this.segments[i].group} has ${this.segments[i].groupSize == grp.Members.length ? grp.Members.length + grpReq.length : grp.Members.length} members ${this.segments[i].groupSize == grp.Members.length ? '(including unconfirmed group requests)' : ''}`
+            )
             this.segments[i].group = this.oldSegments[i].group
-          } else if (this.segments[i].groupSize !== 0 && grp.Members.length + grpReq.length > this.segments[i].groupSize) {
-            alert(`Teams for ${this.segments[i].name} can have at most ${this.segments[i].groupSize} members but ${this.segments[i].group} has ${grp.Members.length + grpReq.length} members (including unaccepted group requests)`)
+          } else if (
+            this.segments[i].groupSize !== 0 &&
+            grp.Members.length + grpReq.length > this.segments[i].groupSize
+          ) {
+            alert(
+              `Teams for ${this.segments[i].name} can have at most ${this.segments[i].groupSize} members but ${this.segments[i].group} has ${grp.Members.length + grpReq.length} members (including unaccepted group requests)`
+            )
             this.segments[i].group = this.oldSegments[i].group
-          } else{
+          } else {
             try {
               this.segments[i].recordID = (
                 await pb.collection('Group_Segment_Group').create({
