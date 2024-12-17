@@ -2,8 +2,6 @@
 import { RouterView } from 'vue-router'
 import CustomFooter from './components/CustomFooter.vue'
 import { defineComponent } from 'vue'
-import { mapStores } from 'pinia'
-import { useMainStore } from './stores/mainStore'
 </script>
 
 <template>
@@ -16,27 +14,15 @@ import { useMainStore } from './stores/mainStore'
 </template>
 
 <script lang="ts">
-import pb from '@/pocketbase'
-
 export default defineComponent({
   async mounted() {
-    if (pb.authStore.record) {
-      this.category = (
-        await pb.collection('Category').getOne(pb.authStore.record.Category)
-      ).Category
-    }
     this.dataReady = true
   },
 
   data() {
     return {
-      category: '',
       dataReady: false
     }
-  },
-
-  computed: {
-    ...mapStores(useMainStore)
   }
 })
 </script>

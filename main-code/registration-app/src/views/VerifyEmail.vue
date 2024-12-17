@@ -10,7 +10,10 @@
     >
       Logout
     </button>
-    <h1>A verification email has been sent. Verify your mail and then click this button</h1>
+    <h1>
+      A verification email has been sent. Verify your mail and then click this button. Make sure to
+      check your promotion and spam folders as well.
+    </h1>
     <button class="default-button" @click="verify()">Completed Verificiation</button>
     <h1>Rerequest Verification</h1>
     <button class="default-button" @click="resend()">Resend</button>

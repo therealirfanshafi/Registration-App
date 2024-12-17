@@ -193,7 +193,12 @@ export default defineComponent({
           .collection('Payment_Info')
           .getFullList({ filter: `Participant = "${pb.authStore.record.id}"` })
       ).length !== 0
-    this.paid = (await pb.collection('Participant').getOne(pb.authStore.record.id)).Paid
+    try {
+      this.paid = (await pb.collection('Participant').getOne(pb.authStore.record.id)).Paid
+    } catch (error) {
+      this.mainStore.logout()
+      location.reload()
+    }
     this.dataReady = true
   },
 

@@ -35,3 +35,4 @@ coverage
 pb_data
 env.json
 pb_public
+deploy.sh

@@ -5,6 +5,7 @@
         <h1>Create new group</h1>
         <label for="new-grp-input">Group Name</label>
         <input type="text" id="new-grp-input" v-model="newGroup" />
+        <p v-if="submitCount > 0 && !validatePresence">Group name cannot be empty</p>
         <p v-if="!validateGroupName">Group name already in use</p>
         <button @click="createNewGroup()" class="default-button">Create Group</button>
       </div>
@@ -180,6 +181,10 @@ export default defineComponent({
       return !this.groupList.includes(this.newGroup.toLowerCase())
     },
 
+    validatePresence() {
+      return this.newGroup !== ''
+    },
+
     ...mapStores(useMainStore)
   },
 
@@ -248,12 +253,15 @@ export default defineComponent({
         }
       ],
       newGroup: '',
+      submitCount: 0,
       dataReady: false
     }
   },
   methods: {
     async createNewGroup() {
-      if (this.validateGroupName) {
+      this.submitCount++
+      if (this.validateGroupName && this.validatePresence) {
+        this.submitCount = 0
         await pb.collection('Group').create({
           Name: this.newGroup,
           Admin: pb.authStore.record.id,
